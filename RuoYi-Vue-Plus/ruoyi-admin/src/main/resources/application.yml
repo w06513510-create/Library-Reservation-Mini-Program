@@ -142,6 +142,8 @@ tenant:
     - sys_client
     - sys_oss_config
     - flow_spel
+    # 资金流水(append-only, 无 tenant_id 列, 按 user_id 归属; 防未来直查漏加 TenantHelper.ignore 时报错)
+    - app_fund_flow
 
 # MyBatisPlus配置
 # https://baomidou.com/config/
