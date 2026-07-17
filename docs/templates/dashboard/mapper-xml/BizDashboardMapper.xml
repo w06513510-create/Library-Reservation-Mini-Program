@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  看板聚合 SQL 模板（提炼自跑腿 ErrandDashboardMapper.xml）。
+  放到 src/main/resources/mapper/biz/BizDashboardMapper.xml（目录被 application.yml 的 mapper-locations 扫描）。
+  示例业务表 biz_order：status(状态) / category(分类) / total_amount(金额) / owner_id(归属人) / create_time / del_flag。
+  改表名、列名、状态码即可套用。注意 XML 里 >= 要写成 &gt;= 。
+-->
+<mapper namespace="org.dromara.biz.mapper.BizDashboardMapper">
+
+    <!-- ① 核心指标：一条 SQL 多聚合(SUM(CASE)/COUNT(DISTINCT)/ROUND(../NULLIF)) -->
+    <select id="selectOverview" resultType="java.util.Map">
+        select
+            count(*)                                                                                   as total,
+            coalesce(sum(case when o.create_time &gt;= curdate() then 1 else 0 end), 0)                   as today,
+            coalesce(sum(case when o.create_time &gt;= date_sub(curdate(), interval 6 day) then 1 else 0 end), 0) as week,
+            coalesce(sum(case when o.status = 5 then 1 else 0 end), 0)                                  as completed,
+            coalesce(sum(case when o.status in (6, 8) then 1 else 0 end), 0)                            as cancelled,
+            coalesce(sum(case when o.status = 5 then o.total_amount else 0 end), 0)                     as totalAmount,
+            count(distinct o.owner_id)                                                                 as activeUsers,
+            round(sum(case when o.status = 5 then 1 else 0 end) / nullif(count(*), 0) * 100, 1)        as completionRate
+        from biz_order o
+        where o.del_flag = '0'
+    </select>
+
+    <!-- ② 状态分布(饼图)：{status, value} -->
+    <select id="selectStatusDist" resultType="java.util.Map">
+        select o.status as status, count(*) as value
+        from biz_order o
+        where o.del_flag = '0'
+        group by o.status
+        order by o.status
+    </select>
+
+    <!-- ③ 分类分布(柱/饼图)：{category, value} -->
+    <select id="selectCategoryDist" resultType="java.util.Map">
+        select o.category as category, count(*) as value
+        from biz_order o
+        where o.del_flag = '0'
+        group by o.category
+        order by value desc
+    </select>
+
+    <!-- ④ 近7日趋势(折线图)：date_format 按天分桶；前端再零填充补齐 7 天 -->
+    <select id="selectTrend" resultType="java.util.Map">
+        select date_format(o.create_time, '%Y-%m-%d')      as date,
+               count(*)                                     as count,
+               coalesce(sum(o.total_amount), 0)             as amount
+        from biz_order o
+        where o.del_flag = '0'
+          and o.create_time &gt;= date_sub(curdate(), interval 6 day)
+        group by date_format(o.create_time, '%Y-%m-%d')
+        order by date asc
+    </select>
+
+    <!-- ⑤ 排行榜 Top10(横向柱图)：left join 取名称，按值倒序 limit 10 -->
+    <select id="selectRank" resultType="java.util.Map">
+        select coalesce(su.nick_name, concat('用户', o.owner_id)) as name,
+               coalesce(sum(o.total_amount), 0)                   as value,
+               count(*)                                           as count
+        from biz_order o
+            left join sys_user su on su.user_id = o.owner_id and su.del_flag = '0'
+        where o.del_flag = '0' and o.status = 5 and o.owner_id is not null
+        group by o.owner_id, su.nick_name
+        order by value desc
+        limit 10
+    </select>
+
+</mapper>
