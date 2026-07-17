@@ -86,6 +86,12 @@
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
 
+        <!--  C端接入基座(app_user) 模块  -->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-app</artifactId>
+        </dependency>
+
         <!--  demo模块  -->
         <dependency>
             <groupId>org.dromara</groupId>

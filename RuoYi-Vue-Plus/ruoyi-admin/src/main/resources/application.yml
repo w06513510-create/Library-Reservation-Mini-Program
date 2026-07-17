@@ -119,6 +119,10 @@ security:
     - /*/api-docs
     - /*/api-docs/**
     - /warm-flow-ui/config
+    # C端(小程序)登录/注册 免鉴权; 其余 /app/** 仍走安全拦截器鉴权
+    - /app/auth/login
+    - /app/auth/register
+    # - /app/auth/wxLogin   # 启用微信登录时再放行
 
 # 多租户配置
 tenant:
