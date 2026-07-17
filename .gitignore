@@ -5,6 +5,10 @@
 **/build/
 *.class
 
+# ===== Python（scripts/ 工具脚本产物）=====
+**/__pycache__/
+*.py[cod]
+
 # ===== IDE / 编辑器 =====
 .idea/
 *.iml

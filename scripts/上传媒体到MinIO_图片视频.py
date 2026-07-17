@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-上传媒体到 MinIO（单图 / 多图 / 视频）→ 登记 sys_oss → 写回业务表字段
+上传媒体到 MinIO（单图 / 多图 / 视频）→ 写回业务表字段（存 URL）
 ========================================================================
 用途：RuoYi-Vue-Plus 项目里几乎每个业务都要传图/视频（商品封面、相册多图、
       认证材料、举证图、宠物近况、演示视频…）。本脚本把"下载 → 传 MinIO →
-      登记 sys_oss → 写回业务字段"这一整段做成可复用模板。
+      写回业务字段"这一整段做成可复用模板，给演示数据灌图用。
 
 配合 SOP 05 "图文必须对应"铁律：
     图片/视频内容必须真实反映实体本身（标"水杯"就得是水杯，绝不张冠李戴）。
     素材先用联网搜索 WebSearch/WebFetch 找到合适的，填进 ITEMS 的 srcs；
     ★ 填之前确认"这确实是这个实体"，入库后再抽样核对一次。
 
-字段存法（本基座实测约定，别记反）：
-    - 单值字段（cover / image_url / video，varchar 255/500）：存【一个 ossId】。
-    - 多值字段（images 等，varchar(1000)，注释"逗号OSS"）：存【逗号拼接的 ossId】。
-    - plus-ui 的 ImageUpload / FileUpload 用 listToString 绑的都是 ossId（不是 URL），
-      前端展示时再由 ossId 换 URL。所以写回默认 store='oss_id'。
-      （极少数字段直接存 URL 时，把该 field 的 "store" 改成 'url'。）
-    - sys_oss.oss_id 是 bigint 主键、非自增 → 本脚本自造雪花风格 id。
+字段存法（本模板的 URL 约定，与前端 MediaUpload / 后端 /resource/media/upload 一致）：
+    - 业务媒体字段【直接存可访问 URL】，不是 ossId、不登记 sys_oss。
+    - 单值字段（cover / image_url / video）：存【一个 URL】。
+    - 多值字段（images 等 varchar(1000)）：存【逗号拼接的多个 URL】。
+    - 读侧：图片 <ImagePreview :src="row.images" />、视频 <VideoView :src="row.video" />。
+    ⚠️ 生成的 URL 前缀要与后端 sys_oss_config 对齐（见 public_url_base），
+       否则应用里点开图/视频会 404。
 
 依赖：
     pip install minio pymysql requests
@@ -54,19 +54,13 @@ CONFIG = {
     "mysql_user": "root",
     "mysql_password": "123456",
     "mysql_db": "your_project_db",             # 【改这里】如 campus_secondhand / pet_adoption
-
-    # ---- sys_oss 登记用的默认值（一般不用改）----
-    "oss_create_dept": 103,                    # 默认部门 id
-    "oss_create_by": 1,                        # admin 用户 id
-    "oss_tenant_id": "000000",
 }
 
 # ============================== ITEMS（【改这里】填实体→字段→素材映射） ==============================
 # 每条 = 一行业务记录。fields 里一行一个要写的列：
 #   col   业务列名
 #   srcs  素材来源列表（http(s) URL 或本机绝对路径），URL 先用 WebSearch/WebFetch 搜到再填
-#   multi True=多值字段(逗号拼接 ossId)；缺省 False=单值字段(取 srcs[0])
-#   store 'oss_id'(默认，plus-ui 约定) 或 'url'(字段直接存 URL 时)
+#   multi True=多值字段(逗号拼接多 URL)；缺省 False=单值字段(取 srcs[0])
 # table/id_col 缺省用 DEFAULT_*，跨表时在该条里单独写。
 DEFAULT_TABLE = "biz_product"                  # 【改这里】主表名
 DEFAULT_ID_COL = "product_id"                  # 【改这里】主键列
@@ -83,18 +77,19 @@ ITEMS = [
 ]
 # =====================================================================================
 
-_id_counter = 0
+_counter = 0
 
 
 def log(msg):
     print(msg, flush=True)
 
 
-def new_oss_id() -> int:
-    """造一个雪花风格的 bigint 主键（时间戳左移 + 自增，够唯一即可）。"""
-    global _id_counter
-    _id_counter = (_id_counter + 1) % 4096
-    return (int(time.time() * 1000) << 12) | _id_counter
+def unique_key(ext: str) -> str:
+    """按日期分目录、时间戳+自增保证唯一的对象 key。"""
+    global _counter
+    _counter = (_counter + 1) % 100000
+    stamp = f'{int(time.time() * 1000)}{_counter:05d}'
+    return f'{datetime.now().strftime("%Y/%m/%d")}/{stamp}{ext}'
 
 
 def ensure_bucket(client: Minio, bucket: str):
@@ -115,28 +110,15 @@ def fetch_bytes(src: str) -> tuple[bytes, str]:
         return f.read(), (os.path.splitext(src)[1] or ".jpg")
 
 
-def upload_one(client: Minio, conn, src: str, name: str) -> tuple[int, str]:
-    """上传单个素材 → 登记 sys_oss。返回 (oss_id, url)。"""
+def upload_one(client: Minio, src: str, name: str) -> str:
+    """上传单个素材到 MinIO，返回可访问 URL。"""
     data, ext = fetch_bytes(src)
-    key = f'{datetime.now().strftime("%Y/%m/%d")}/{new_oss_id()}{ext}'
+    key = unique_key(ext)
     ctype = mimetypes.types_map.get(ext, "application/octet-stream")
     client.put_object(CONFIG["minio_bucket"], key, io.BytesIO(data), length=len(data), content_type=ctype)
     url = f'{CONFIG["public_url_base"].rstrip("/")}/{key}'
-
-    oss_id = new_oss_id()
-    with conn.cursor() as cur:
-        cur.execute(
-            """
-            INSERT INTO sys_oss
-                (oss_id, tenant_id, file_name, original_name, file_suffix, url,
-                 service, create_dept, create_by, create_time)
-            VALUES (%s, %s, %s, %s, %s, %s, 'minio', %s, %s, NOW())
-            """,
-            (oss_id, CONFIG["oss_tenant_id"], key, f"{name or 'media'}{ext}", ext, url,
-             CONFIG["oss_create_dept"], CONFIG["oss_create_by"]),
-        )
-    log(f"  [oss] {name} <- {os.path.basename(src.split('?')[0])}  oss_id={oss_id}")
-    return oss_id, url
+    log(f"  [minio] {name} <- {os.path.basename(src.split('?')[0])}  -> {url}")
+    return url
 
 
 def process_item(client: Minio, conn, item) -> None:
@@ -148,11 +130,9 @@ def process_item(client: Minio, conn, item) -> None:
     for field in item["fields"]:
         col, srcs = field["col"], field["srcs"]
         multi = field.get("multi", False)
-        store = field.get("store", "oss_id")
 
-        pairs = [upload_one(client, conn, s, name) for s in srcs]      # [(oss_id, url), ...]
-        vals = [(oid if store == "oss_id" else url) for oid, url in pairs]
-        bind = ",".join(str(v) for v in vals) if multi else str(vals[0])
+        urls = [upload_one(client, s, name) for s in srcs]
+        bind = ",".join(urls) if multi else urls[0]
 
         with conn.cursor() as cur:
             cur.execute(
