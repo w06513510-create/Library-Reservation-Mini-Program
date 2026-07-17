@@ -1,0 +1,21 @@
+# 支付宝沙箱配置示例（ruoyi-common-alipay 模块读取）。用法：
+#   1) 复制本文件为同目录 application-alipay.yml（真实文件已被 .gitignore，切勿提交，内含私钥）
+#   2) 填入你自己的沙箱应用凭据（支付宝开放平台-沙箱：https://open.alipay.com/develop/sandbox/app）
+#   3) 由 application.yml 的 spring.config.import 以 optional 方式导入；未配置 app-id 时
+#      AlipayClient 不装配、不影响启动（见 AlipayConfig @ConditionalOnProperty）。
+# 备注：sign-type / format / charset 已在 AlipayProperties 设默认值(RSA2 / json / utf-8)，一般无需覆写。
+# 时间：本工程所有项目按中国时间 Asia/Shanghai (UTC+8)。
+# 提示：本仓库多项目共用同一沙箱应用，真实凭据见 `Campus Secondhand Market/alipay-sandbox.local.md`。
+alipay:
+  # 沙箱应用 AppID
+  app-id: your-sandbox-app-id
+  # 沙箱网关（正式环境改为 https://openapi.alipay.com/gateway.do）
+  gateway: https://openapi-sandbox.dl.alipaydev.com/gateway.do
+  # 支付成功同步跳回地址（改成你项目前端地址/路由，端口按项目；模板前端 8188）
+  return-url: http://localhost:8188/pay/result
+  # 支付结果异步通知地址（本地无公网时以 alipay.trade.query 查单为准，通知作补充；模板后端 8199）
+  notify-url: http://localhost:8199/<biz>/pay/notify
+  # 应用私钥（沙箱-RSA2 应用私钥，勿提交真实值）
+  app-private-key: your-app-private-key
+  # 支付宝公钥（沙箱-支付宝公钥）
+  alipay-public-key: your-alipay-public-key

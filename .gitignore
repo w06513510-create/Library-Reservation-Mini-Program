@@ -1,0 +1,36 @@
+# ===== 依赖与构建产物 =====
+**/node_modules/
+**/target/
+**/dist/
+**/build/
+*.class
+
+# ===== IDE / 编辑器 =====
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+
+# ===== 日志 =====
+*.log
+logs/
+**/logs/
+
+# ===== 前端本地环境（.env.development 需保留跟踪，勿忽略）=====
+**/.env.local
+**/*.local
+**/.eslintcache
+**/.vite/
+
+# ===== 后端本地密钥（勿提交；只提交 application-alipay.yml.example 模板）=====
+**/application-alipay*.yml
+
+# ===== 临时 / 验证产物 =====
+pictures/temp/
+.playwright-mcp/
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
