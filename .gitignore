@@ -34,6 +34,8 @@ logs/
 # ===== 临时 / 验证产物 =====
 pictures/temp/
 .playwright-mcp/
+.claude/
+*_verify.log
 
 # ===== 操作系统 =====
 .DS_Store
