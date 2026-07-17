@@ -123,6 +123,8 @@ security:
     - /app/auth/login
     - /app/auth/register
     # - /app/auth/wxLogin   # 启用微信登录时再放行
+    # 支付宝异步通知回调(服务器回调, 无 token); 仅此一个 /app/recharge 端点放行, 其余充值端点仍鉴权
+    - /app/recharge/notify
 
 # 多租户配置
 tenant:

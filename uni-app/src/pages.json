@@ -12,6 +12,13 @@
       }
     },
     {
+      "path": "pages/wallet/wallet",
+      "style": {
+        "navigationBarTitleText": "我的钱包",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
       "path": "pages/mine/mine",
       "style": { "navigationBarTitleText": "我的" }
     },
@@ -27,6 +34,7 @@
     "list": [
       { "pagePath": "pages/index/index", "text": "首页" },
       { "pagePath": "pages/demo/list", "text": "示例" },
+      { "pagePath": "pages/wallet/wallet", "text": "钱包" },
       { "pagePath": "pages/mine/mine", "text": "我的" }
     ]
   },

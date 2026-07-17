@@ -92,6 +92,12 @@
             <artifactId>ruoyi-app</artifactId>
         </dependency>
 
+        <!--  支付/钱包基座(钱包对平 + 支付宝充值) 模块  -->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-pay</artifactId>
+        </dependency>
+
         <!--  demo模块  -->
         <dependency>
             <groupId>org.dromara</groupId>
