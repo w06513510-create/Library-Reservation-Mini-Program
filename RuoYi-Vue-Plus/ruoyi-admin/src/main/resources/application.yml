@@ -123,6 +123,8 @@ security:
     - /app/auth/login
     - /app/auth/register
     # - /app/auth/wxLogin   # 启用微信登录时再放行
+    # 支付宝异步通知回调(服务器回调, 无 token); 仅此一个 /app/recharge 端点放行, 其余充值端点仍鉴权
+    - /app/recharge/notify
 
 # 多租户配置
 tenant:
@@ -140,6 +142,8 @@ tenant:
     - sys_client
     - sys_oss_config
     - flow_spel
+    # 资金流水(append-only, 无 tenant_id 列, 按 user_id 归属; 防未来直查漏加 TenantHelper.ignore 时报错)
+    - app_fund_flow
 
 # MyBatisPlus配置
 # https://baomidou.com/config/

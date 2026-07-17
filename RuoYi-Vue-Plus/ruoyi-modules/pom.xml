@@ -12,6 +12,7 @@
     <modules>
         <module>ruoyi-app</module>
         <module>ruoyi-message</module>
+        <module>ruoyi-pay</module>
         <module>ruoyi-demo</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-job</module>
