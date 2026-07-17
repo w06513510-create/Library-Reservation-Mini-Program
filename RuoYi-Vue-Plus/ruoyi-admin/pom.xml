@@ -92,6 +92,12 @@
             <artifactId>ruoyi-app</artifactId>
         </dependency>
 
+        <!--  站内消息/通知中心 模块  -->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-message</artifactId>
+        </dependency>
+
         <!--  demo模块  -->
         <dependency>
             <groupId>org.dromara</groupId>

@@ -357,6 +357,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!--  站内消息/通知中心  -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-message</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!--  工作流模块  -->
             <dependency>
                 <groupId>org.dromara</groupId>

@@ -10,6 +10,14 @@
         <text class="row-label">📄 分页示例（useList）</text>
         <text class="arrow">›</text>
       </view>
+      <view class="row row--border" @click="goNotice">
+        <text class="row-label">🔔 通知中心</text>
+        <text class="arrow">›</text>
+      </view>
+      <view class="row row--border" @click="goConversations">
+        <text class="row-label">💬 站内私信</text>
+        <text class="arrow">›</text>
+      </view>
       <view class="row row--border" @click="goMine">
         <text class="row-label">👤 我的</text>
         <text class="arrow">›</text>
@@ -37,6 +45,12 @@ function goDemo() {
 }
 function goMine() {
   uni.switchTab({ url: '/pages/mine/mine' });
+}
+function goNotice() {
+  uni.navigateTo({ url: '/pages/message/notice' });
+}
+function goConversations() {
+  uni.navigateTo({ url: '/pages/message/conversations' });
 }
 function goLogin() {
   uni.navigateTo({ url: '/pages/login/login' });

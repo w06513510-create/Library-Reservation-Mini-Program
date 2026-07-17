@@ -18,6 +18,24 @@
     {
       "path": "pages/login/login",
       "style": { "navigationBarTitleText": "登录" }
+    },
+    {
+      "path": "pages/message/notice",
+      "style": {
+        "navigationBarTitleText": "通知中心",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/message/conversations",
+      "style": {
+        "navigationBarTitleText": "消息",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/message/chat",
+      "style": { "navigationBarTitleText": "聊天" }
     }
   ],
   "tabBar": {
