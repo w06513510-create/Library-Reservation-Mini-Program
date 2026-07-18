@@ -1,0 +1,64 @@
+site_name: RuoYi 基座 · 通用能力文档
+site_description: ruoyi_template 从 5 个毕设项目抽出的跨项目通用能力（C端接入 / 消息 / 支付钱包 / 媒体上传 / 脚手架模板）
+docs_dir: docs
+site_dir: ../../_site-ruoyi-template-docs
+dev_addr: 127.0.0.1:18100
+use_directory_urls: true
+
+theme:
+  name: material
+  language: zh
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: 切换到深色模式
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: 切换到浅色模式
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.instant
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - toc.follow
+
+markdown_extensions:
+  - tables
+  - fenced_code
+  - codehilite
+  - toc:
+      permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+plugins:
+  - search:
+      lang: zh
+
+nav:
+  - 首页: README.md
+  - 通用能力:
+      - 总览与选型: 能力/00-总览.md
+      - ① C端接入基座 (ruoyi-app): 能力/01-C端接入基座.md
+      - ② 消息 / 通知中心 (ruoyi-message): 能力/02-消息通知中心.md
+      - ③④ 支付与钱包 (ruoyi-pay): 能力/03-支付与钱包.md
+      - 媒体上传组件: 能力/04-媒体上传.md
+      - ⑤~⑧ 脚手架 / 代码模板: 能力/05-脚手架模板.md
+  - 术语与约定: glossary.md
