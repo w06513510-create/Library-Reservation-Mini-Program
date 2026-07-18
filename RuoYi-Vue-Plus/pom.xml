@@ -371,6 +371,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!--  通用互动(收藏/点赞/关注)  -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-interaction</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!--  工作流模块  -->
             <dependency>
                 <groupId>org.dromara</groupId>

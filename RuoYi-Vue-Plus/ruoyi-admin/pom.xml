@@ -104,6 +104,12 @@
             <artifactId>ruoyi-pay</artifactId>
         </dependency>
 
+        <!--  通用互动(收藏/点赞/关注) 模块  -->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-interaction</artifactId>
+        </dependency>
+
         <!--  demo模块  -->
         <dependency>
             <groupId>org.dromara</groupId>

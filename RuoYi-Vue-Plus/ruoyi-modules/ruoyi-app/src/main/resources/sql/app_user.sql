@@ -22,7 +22,7 @@ create table app_user (
   create_time     datetime                                comment '创建时间',
   update_by       bigint                                  comment '更新者',
   update_time     datetime                                comment '更新时间',
-  del_flag        char(1)       default '0'               comment '删除标志(0存在 2删除)',
+  del_flag        char(1)       default '0'               comment '删除标志(0存在 1删除, MP逻辑删除默认值)',
   primary key (id),
   unique key uk_user_phone (phone, tenant_id),
   key idx_user_openid (openid)
