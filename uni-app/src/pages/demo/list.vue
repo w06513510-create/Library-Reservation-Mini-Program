@@ -5,9 +5,14 @@
     <template v-else>
       <view class="item" v-for="it in list" :key="it.id">
         <text class="title">{{ it.title }}</text>
-        <text class="badge" :style="{ color: dictColor(AUDIT_STATUS, it.status) }">
-          {{ dictLabel(AUDIT_STATUS, it.status) }}
-        </text>
+        <view class="right">
+          <text class="badge" :style="{ color: dictColor(AUDIT_STATUS, it.status) }">
+            {{ dictLabel(AUDIT_STATUS, it.status) }}
+          </text>
+          <text class="fav" :class="{ on: favSet.has(it.id) }" @click="toggleFav(it.id)">
+            {{ favSet.has(it.id) ? '♥' : '♡' }}
+          </text>
+        </view>
       </view>
 
       <view v-if="loading" class="foot">加载中…</view>
@@ -18,11 +23,13 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { onShow, onReachBottom, onPullDownRefresh } from '@dcloudio/uni-app';
 import { request } from '../../utils/request';
 import { useAuthStore } from '../../store/auth';
 import { useList } from '../../composables/useList';
 import { dictLabel, dictColor, AUDIT_STATUS } from '../../utils/dict';
+import { apiToggle, apiMyBizIds } from '../../api/interaction';
 
 interface DemoItem {
   id: number;
@@ -38,8 +45,30 @@ const { list, loading, finished, reload, loadMore, onRefresh } = useList<DemoIte
   immediate: false
 });
 
+// 我收藏了哪些 demo 对象（bizType=demo, action=favorite）；演示通用互动模块
+const favSet = ref<Set<number>>(new Set());
+async function loadFav() {
+  try {
+    const r = await apiMyBizIds('favorite', 'demo', 1, 100);
+    favSet.value = new Set(r.rows || []);
+  } catch (e) {
+    // 忽略：未登录/网络异常由 request 统一处理
+  }
+}
+async function toggleFav(id: number) {
+  const r = await apiToggle('favorite', 'demo', id).catch(() => null);
+  if (!r) return;
+  const s = new Set(favSet.value);
+  if (r.data?.active) s.add(id);
+  else s.delete(id);
+  favSet.value = s;
+}
+
 onShow(() => {
-  if (authStore.isLogin) reload();
+  if (authStore.isLogin) {
+    reload();
+    loadFav();
+  }
 });
 onReachBottom(() => {
   if (authStore.isLogin) loadMore();
@@ -78,8 +107,20 @@ function goLogin() {
     font-size: 30rpx;
     color: #303133;
   }
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 24rpx;
+  }
   .badge {
     font-size: 26rpx;
+  }
+  .fav {
+    font-size: 40rpx;
+    color: #c0c4cc;
+    &.on {
+      color: #f56c6c;
+    }
   }
 }
 .foot {

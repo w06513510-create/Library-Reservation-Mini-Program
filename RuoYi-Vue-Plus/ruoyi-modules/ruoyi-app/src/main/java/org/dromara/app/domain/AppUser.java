@@ -59,7 +59,7 @@ public class AppUser extends TenantEntity {
     /** 最后登录时间 */
     private Date lastLoginTime;
 
-    /** 逻辑删除标志(0存在 2删除) */
+    /** 逻辑删除标志(0存在 1删除, MyBatis-Plus 逻辑删除默认值) */
     @TableLogic
     private String delFlag;
 

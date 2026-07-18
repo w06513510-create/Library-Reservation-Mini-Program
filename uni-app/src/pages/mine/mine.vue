@@ -26,6 +26,10 @@
         <text class="menu-label">✏️ 修改昵称</text>
         <text class="arrow">›</text>
       </view>
+      <view class="menu-row menu-row--border" @click="goFavorites">
+        <text class="menu-label">⭐ 我的收藏</text>
+        <text class="arrow">›</text>
+      </view>
     </view>
 
     <button v-if="authStore.isLogin" class="btn-logout" @click="doLogout">退出登录</button>
@@ -48,6 +52,10 @@ onShow(() => {
 
 function goLogin() {
   uni.navigateTo({ url: '/pages/login/login' });
+}
+
+function goFavorites() {
+  uni.navigateTo({ url: '/pages/mine/favorites' });
 }
 
 async function changeAvatar() {
