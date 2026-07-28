@@ -2,11 +2,10 @@
 setlocal
 REM ============================================================
 REM  run-frontend.bat  --  start plus-ui (Vite dev server, npm)
-REM  Sits next to run.bat (backend) in Template\scripts\.
-REM  cd's to the plus-ui project (Template\plus-ui) and runs npm run dev.
+REM  Sits in scripts\ next to run-backend.bat.
+REM  cd's to the plus-ui project (..\plus-ui) and runs npm run dev.
 REM
 REM  This project uses npm (package-lock.json), NOT yarn.
-REM  (stock plus-ui\bin\run-web.bat runs `yarn dev`, which fails on this setup.)
 REM  Dev server: http://localhost:8188  (VITE_APP_PORT in .env.development).
 REM  Changing .env requires restarting this script (Vite reads env at boot).
 REM ============================================================
@@ -15,7 +14,7 @@ REM ---- pin Node (this machine) ----
 set "NODE_HOME=D:\nodejs"
 set "PATH=%NODE_HOME%;%PATH%"
 
-REM ---- go to plus-ui root: scripts\ -> Template\ -> plus-ui ----
+REM ---- go to plus-ui root: scripts\ -> project root -> plus-ui ----
 cd /d "%~dp0..\plus-ui"
 if not exist "package.json" ( echo [ERROR] plus-ui not found at %cd% & goto :end )
 
