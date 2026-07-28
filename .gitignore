@@ -4,6 +4,7 @@
 **/dist/
 **/build/
 *.class
+**/cp.txt
 
 # ===== Python（scripts/ 工具脚本产物）=====
 **/__pycache__/
