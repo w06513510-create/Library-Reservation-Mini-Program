@@ -50,6 +50,19 @@
 
       <el-table v-loading="loading" border :data="bookList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
+        <el-table-column label="封面" align="center" width="70">
+          <template #default="scope">
+            <el-image
+              v-if="scope.row.coverUrl"
+              :src="scope.row.coverUrl"
+              :preview-src-list="[scope.row.coverUrl]"
+              :preview-teleported="true"
+              fit="cover"
+              style="width: 42px; height: 58px; border-radius: 3px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18)"
+            />
+            <el-icon v-else style="color: #c0c4cc"><Picture /></el-icon>
+          </template>
+        </el-table-column>
         <el-table-column label="题名" align="center" prop="title" show-overflow-tooltip />
         <el-table-column label="著者" align="center" prop="author" show-overflow-tooltip />
         <el-table-column label="ISBN" align="center" prop="isbn" width="140" />
