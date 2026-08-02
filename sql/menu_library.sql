@@ -1,8 +1,7 @@
 -- =============================================================
--- 图书馆预约系统 菜单与权限点 sys_menu（租户 000000）
--- id 段：12000-12999（避开核心菜单，max menu_id=11806）
--- 幂等：先删本段菜单再重灌
--- 超管(role_id=1)天然 bypass 看全部菜单，无需 sys_role_menu；按角色可见范围在 04 阶段配
+-- 图书馆预约系统 菜单与权限点 sys_menu（租户 000000）·由 _gen_menu.py 生成
+-- id 段 12000-12999（max menu_id=11806）；幂等：先删本段再重灌
+-- 超管(role_id=1) 天然 bypass 看全部；按角色可见范围在 04 阶段配
 -- =============================================================
 SET NAMES utf8mb4;
 
@@ -12,13 +11,74 @@ DELETE FROM sys_menu WHERE menu_id BETWEEN 12000 AND 12999;
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, query_param, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
 VALUES (12000, '图书馆管理', 0, 5, 'library', '', '', 1, 0, 'M', '0', '0', '', 'education', 103, 1, NOW(), NULL, NULL, '图书馆预约系统');
 
--- 场馆管理（参考模块样板）
-INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, query_param, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark)
-VALUES (12010, '场馆管理', 12000, 1, 'venue', 'library/venue/index', '', 1, 0, 'C', '0', '0', 'library:venue:list', 'list', 103, 1, NOW(), NULL, NULL, '');
-
+-- 业务菜单（C）
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, query_param, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES
-(12011, '场馆查询', 12010, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:venue:query',  '#', 103, 1, NOW(), NULL, NULL, ''),
-(12012, '场馆新增', 12010, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:venue:add',    '#', 103, 1, NOW(), NULL, NULL, ''),
-(12013, '场馆修改', 12010, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:venue:edit',   '#', 103, 1, NOW(), NULL, NULL, ''),
+(12010, '场馆管理', 12000, 1, 'venue', 'library/venue/index', '', 1, 0, 'C', '0', '0', 'library:venue:list', 'list', 103, 1, NOW(), NULL, NULL, ''),
+(12020, '楼层管理', 12000, 2, 'floor', 'library/floor/index', '', 1, 0, 'C', '0', '0', 'library:floor:list', 'tree', 103, 1, NOW(), NULL, NULL, ''),
+(12030, '区域管理', 12000, 3, 'area', 'library/area/index', '', 1, 0, 'C', '0', '0', 'library:area:list', 'tree-table', 103, 1, NOW(), NULL, NULL, ''),
+(12040, '座位管理', 12000, 4, 'seat', 'library/seat/index', '', 1, 0, 'C', '0', '0', 'library:seat:list', 'table', 103, 1, NOW(), NULL, NULL, ''),
+(12050, '研讨间管理', 12000, 5, 'room', 'library/room/index', '', 1, 0, 'C', '0', '0', 'library:room:list', 'component', 103, 1, NOW(), NULL, NULL, ''),
+(12060, '藏地管理', 12000, 6, 'location', 'library/location/index', '', 1, 0, 'C', '0', '0', 'library:location:list', 'guide', 103, 1, NOW(), NULL, NULL, ''),
+(12070, '书架管理', 12000, 7, 'shelf', 'library/shelf/index', '', 1, 0, 'C', '0', '0', 'library:shelf:list', 'list', 103, 1, NOW(), NULL, NULL, ''),
+(12080, '书目管理', 12000, 8, 'book', 'library/book/index', '', 1, 0, 'C', '0', '0', 'library:book:list', 'documentation', 103, 1, NOW(), NULL, NULL, ''),
+(12090, '馆藏册管理', 12000, 9, 'bookItem', 'library/bookItem/index', '', 1, 0, 'C', '0', '0', 'library:bookItem:list', 'form', 103, 1, NOW(), NULL, NULL, ''),
+(12100, '规则配置', 12000, 10, 'ruleConfig', 'library/ruleConfig/index', '', 1, 0, 'C', '0', '0', 'library:ruleConfig:list', 'clipboard', 103, 1, NOW(), NULL, NULL, ''),
+(12110, '读者档案', 12000, 11, 'reader', 'library/reader/index', '', 1, 0, 'C', '0', '0', 'library:reader:list', 'star', 103, 1, NOW(), NULL, NULL, '');
+
+-- 权限点（F）
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, query_param, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES
+(12011, '场馆查询', 12010, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:venue:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12012, '场馆新增', 12010, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:venue:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12013, '场馆修改', 12010, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:venue:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
 (12014, '场馆删除', 12010, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:venue:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
-(12015, '场馆导出', 12010, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:venue:export', '#', 103, 1, NOW(), NULL, NULL, '');
+(12015, '场馆导出', 12010, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:venue:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12021, '楼层查询', 12020, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:floor:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12022, '楼层新增', 12020, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:floor:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12023, '楼层修改', 12020, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:floor:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12024, '楼层删除', 12020, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:floor:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12025, '楼层导出', 12020, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:floor:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12031, '区域查询', 12030, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:area:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12032, '区域新增', 12030, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:area:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12033, '区域修改', 12030, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:area:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12034, '区域删除', 12030, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:area:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12035, '区域导出', 12030, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:area:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12041, '座位查询', 12040, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:seat:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12042, '座位新增', 12040, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:seat:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12043, '座位修改', 12040, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:seat:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12044, '座位删除', 12040, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:seat:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12045, '座位导出', 12040, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:seat:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12051, '研讨间查询', 12050, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:room:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12052, '研讨间新增', 12050, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:room:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12053, '研讨间修改', 12050, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:room:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12054, '研讨间删除', 12050, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:room:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12055, '研讨间导出', 12050, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:room:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12061, '藏地查询', 12060, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:location:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12062, '藏地新增', 12060, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:location:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12063, '藏地修改', 12060, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:location:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12064, '藏地删除', 12060, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:location:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12065, '藏地导出', 12060, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:location:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12071, '书架查询', 12070, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:shelf:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12072, '书架新增', 12070, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:shelf:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12073, '书架修改', 12070, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:shelf:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12074, '书架删除', 12070, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:shelf:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12075, '书架导出', 12070, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:shelf:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12081, '书目查询', 12080, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:book:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12082, '书目新增', 12080, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:book:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12083, '书目修改', 12080, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:book:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12084, '书目删除', 12080, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:book:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12085, '书目导出', 12080, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:book:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12091, '馆藏册查询', 12090, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:bookItem:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12092, '馆藏册新增', 12090, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:bookItem:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12093, '馆藏册修改', 12090, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:bookItem:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12094, '馆藏册删除', 12090, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:bookItem:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12095, '馆藏册导出', 12090, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:bookItem:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12101, '规则配置查询', 12100, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:ruleConfig:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12102, '规则配置新增', 12100, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:ruleConfig:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12103, '规则配置修改', 12100, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:ruleConfig:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12104, '规则配置删除', 12100, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:ruleConfig:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12105, '规则配置导出', 12100, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:ruleConfig:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12111, '读者档案查询', 12110, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:reader:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12112, '读者档案新增', 12110, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:reader:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12113, '读者档案修改', 12110, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:reader:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12114, '读者档案删除', 12110, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:reader:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12115, '读者档案导出', 12110, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:reader:export', '#', 103, 1, NOW(), NULL, NULL, '');
