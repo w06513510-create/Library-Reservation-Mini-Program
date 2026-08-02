@@ -1,0 +1,67 @@
+# 图书馆预约系统 · 毕设项目文档站
+# 骨架抄自 SOP 站（building-mkdocs-business-docs 模板）：已内置中文锚点 slugify、docs_dir 子目录、mermaid。
+# 路径可移植：docs_dir / site_dir 均相对，站点可整体移动。
+site_name: 图书馆预约系统 · 毕设文档
+site_description: 高校图书馆座位/自习室预约 + 图书借阅系统（RuoYi-Vue-Plus 后台 + 微信小程序）· 需求 / 数据库 / 交付说明
+docs_dir: docs
+site_dir: site
+dev_addr: 127.0.0.1:18099            # 本项目专用端口（SOP 端口表往后顺延，避开 18092/18100）
+use_directory_urls: true
+
+extra_css:
+  - stylesheets/extra.css
+
+theme:
+  name: material
+  language: zh
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: 切换到深色模式
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: 切换到浅色模式
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    - toc.follow
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+
+markdown_extensions:
+  - tables
+  - fenced_code
+  - codehilite
+  - attr_list
+  - toc:
+      permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+plugins:
+  - search:
+      lang: zh
+
+# 随主线阶段增量长出：01 需求已出；02 数据库设计 / 03 交付说明 后续阶段补。
+nav:
+  - 首页: index.md
+  - 需求:
+      - 01 需求规格说明书: 01-需求规格说明书.md

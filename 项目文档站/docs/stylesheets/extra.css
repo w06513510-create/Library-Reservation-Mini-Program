@@ -1,0 +1,120 @@
+/* ============================================================
+   MkDocs 文档站 · 默认自定义滚动条（含方向箭头按钮）
+   —— 复制本文件到站点 docs/stylesheets/extra.css，并在 mkdocs.yml 里：
+        extra_css:
+          - stylesheets/extra.css
+   —— 颜色用主题变量 var(--md-primary-fg-color)，换 palette 主色时自动跟随。
+   两部分：1) 正文 / 宽表格 / 宽代码块滚动条  2) 顶部导航标签栏溢出时的横向滚动条
+   （标签多到一行放不下时，Material 默认把那条滚动条藏了、末尾标签点不到；这里强制显示。）
+   ============================================================ */
+
+/* ---------- 1. 正文区滚动条（纵向 + 横向，横向带方向按钮） ---------- */
+
+/* Firefox（不支持按钮，仅上色） */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: var(--md-primary-fg-color, #3f51b5) rgba(63, 81, 181, 0.12);
+}
+
+/* WebKit / Chromium / Edge */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(63, 81, 181, 0.10);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--md-primary-fg-color, #3f51b5);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  min-width: 40px;
+  min-height: 40px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #303f9f;
+  background-clip: padding-box;
+  border: 3px solid transparent;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* 方向按钮：只在横向滚动条两端显示左右箭头 */
+::-webkit-scrollbar-button {
+  display: none;
+}
+::-webkit-scrollbar-button:horizontal:single-button {
+  display: block;
+  background-color: var(--md-primary-fg-color, #3f51b5);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 8px 8px;
+  width: 16px;
+  height: 14px;
+}
+::-webkit-scrollbar-button:horizontal:single-button:hover {
+  background-color: #303f9f;
+}
+::-webkit-scrollbar-button:horizontal:decrement {
+  border-radius: 10px 0 0 10px;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M6 0.5 L2 4 L6 7.5 Z' fill='white'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:horizontal:increment {
+  border-radius: 0 10px 10px 0;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M2 0.5 L6 4 L2 7.5 Z' fill='white'/%3E%3C/svg%3E");
+}
+
+/* 深色模式：轨道更暗一点，箭头维持白色 */
+[data-md-color-scheme="slate"] ::-webkit-scrollbar-track {
+  background: rgba(159, 168, 218, 0.14);
+}
+
+/* ---------- 2. 顶部导航标签栏溢出滚动条（navigation.tabs） ---------- */
+/* Material 默认隐藏了这条滚动条：标签一行放不下时会被切掉、够不到最后一项。
+   标签栏是主色底，故这里用浅色滚动条，醒目可见。 */
+.md-tabs__list {
+  overflow-x: auto;
+  scrollbar-width: thin;                             /* Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.85) rgba(255, 255, 255, 0.20);
+}
+.md-tabs__list::-webkit-scrollbar {
+  display: block !important;                         /* 覆盖 Material 的隐藏 */
+  height: 8px;
+}
+.md-tabs__list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+}
+.md-tabs__list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.md-tabs__list::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+  background-clip: padding-box;
+}
+.md-tabs__list::-webkit-scrollbar-button:horizontal:single-button {
+  display: block;
+  width: 14px;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.85);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 6px 6px;
+}
+.md-tabs__list::-webkit-scrollbar-button:horizontal:single-button:hover {
+  background-color: #ffffff;
+}
+.md-tabs__list::-webkit-scrollbar-button:horizontal:decrement {
+  border-radius: 8px 0 0 8px;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M6 0.5 L2 4 L6 7.5 Z' fill='%233f51b5'/%3E%3C/svg%3E");
+}
+.md-tabs__list::-webkit-scrollbar-button:horizontal:increment {
+  border-radius: 0 8px 8px 0;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M2 0.5 L6 4 L2 7.5 Z' fill='%233f51b5'/%3E%3C/svg%3E");
+}

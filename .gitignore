@@ -32,6 +32,9 @@ logs/
 # ===== 后端本地密钥（勿提交；只提交 application-alipay.yml.example 模板）=====
 **/application-alipay*.yml
 
+# ===== MkDocs 文档站构建产物（源在 docs/，site/ 为产物不入库）=====
+项目文档站/site/
+
 # ===== 临时 / 验证产物 =====
 pictures/temp/
 .playwright-mcp/
