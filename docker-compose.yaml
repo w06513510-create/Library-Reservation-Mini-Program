@@ -37,6 +37,30 @@ services:
       "
     restart: "no"
 
+  # SnailJob 分布式任务调度服务端（客户端=后端应用，17888 连接；控制台 http://localhost:8800）
+  # 支撑图书馆定时兜底：超时未签到/暂离超时/到期释放、图书逾期判定、预约架超期、信用衰减、黑名单到期解除
+  # datasource 指向本机原生 MySQL 的 library_reservation（sj_* 表由 ry_job.sql 导入；任务见 sql/snailjob_library.sql）
+  snail-job-server:
+    image: opensnail/snail-job:1.10.0
+    container_name: library-snailjob
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # 容器访问本机原生 MySQL
+    ports:
+      - "8800:8080"    # Web 控制台
+      - "17888:17888"  # RPC 端口（对齐后端 snail-job.server.port）
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://host.docker.internal:3306/library_reservation?useSSL=false&characterEncoding=utf8&useUnicode=true&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: "123456"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || curl -fsS http://localhost:8080/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 90s          # 依赖本机外部 MySQL，留足启动时间
+
 volumes:
   library-redis-data:
   library-minio-data:
