@@ -23,7 +23,8 @@ INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 (12080, '书目管理', 12000, 8, 'book', 'library/book/index', '', 1, 0, 'C', '0', '0', 'library:book:list', 'documentation', 103, 1, NOW(), NULL, NULL, ''),
 (12090, '馆藏册管理', 12000, 9, 'bookItem', 'library/bookItem/index', '', 1, 0, 'C', '0', '0', 'library:bookItem:list', 'form', 103, 1, NOW(), NULL, NULL, ''),
 (12100, '规则配置', 12000, 10, 'ruleConfig', 'library/ruleConfig/index', '', 1, 0, 'C', '0', '0', 'library:ruleConfig:list', 'clipboard', 103, 1, NOW(), NULL, NULL, ''),
-(12110, '读者档案', 12000, 11, 'reader', 'library/reader/index', '', 1, 0, 'C', '0', '0', 'library:reader:list', 'star', 103, 1, NOW(), NULL, NULL, '');
+(12110, '读者档案', 12000, 11, 'reader', 'library/reader/index', '', 1, 0, 'C', '0', '0', 'library:reader:list', 'star', 103, 1, NOW(), NULL, NULL, ''),
+(12120, '座位预约', 12000, 12, 'reservation', 'library/reservation/index', '', 1, 0, 'C', '0', '0', 'library:reservation:list', 'checkbox', 103, 1, NOW(), NULL, NULL, '');
 
 -- 权限点（F）
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, query_param, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES
@@ -81,4 +82,8 @@ INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 (12112, '读者档案新增', 12110, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:reader:add', '#', 103, 1, NOW(), NULL, NULL, ''),
 (12113, '读者档案修改', 12110, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:reader:edit', '#', 103, 1, NOW(), NULL, NULL, ''),
 (12114, '读者档案删除', 12110, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:reader:remove', '#', 103, 1, NOW(), NULL, NULL, ''),
-(12115, '读者档案导出', 12110, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:reader:export', '#', 103, 1, NOW(), NULL, NULL, '');
+(12115, '读者档案导出', 12110, 5, '', '', '', 1, 0, 'F', '0', '0', 'library:reader:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12121, '座位预约查询', 12120, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:reservation:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12122, '座位预约约座', 12120, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:reservation:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12123, '座位预约管理', 12120, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:reservation:manage', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12124, '座位预约导出', 12120, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:reservation:export', '#', 103, 1, NOW(), NULL, NULL, '');
