@@ -4,6 +4,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.library.domain.bo.ReservationBo;
 import org.dromara.library.domain.vo.ReservationVo;
+import org.dromara.library.domain.vo.SeatStatusVo;
 
 import java.util.Date;
 import java.util.List;
@@ -45,5 +46,8 @@ public interface IReservationService {
 
     /** 管理员强制释放 {0,1,2}→3 */
     Boolean forceRelease(Long id, String reason);
+
+    /** 平面图选座：某楼层各座位坐标 + 所选时段占用状态（亮点①；时间用字符串比较，绕开时区偏移） */
+    List<SeatStatusVo> seatStatus(Long floorId, String start, String end);
 
 }

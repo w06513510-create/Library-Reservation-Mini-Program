@@ -13,6 +13,7 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.library.domain.bo.ReservationBo;
 import org.dromara.library.domain.vo.ReservationVo;
+import org.dromara.library.domain.vo.SeatStatusVo;
 import org.dromara.library.service.IReservationService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 座位预约Controller（状态机 + 管理干预）
@@ -42,6 +44,17 @@ public class ReservationController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<ReservationVo> list(@Validated(QueryGroup.class) ReservationBo bo, PageQuery pageQuery) {
         return reservationService.queryPageList(bo, pageQuery);
+    }
+
+    /**
+     * 平面图选座：某楼层各座位坐标 + 所选时段占用状态（亮点①）
+     */
+    @SaCheckPermission("library:reservation:list")
+    @GetMapping("/seatStatus")
+    public R<List<SeatStatusVo>> seatStatus(@RequestParam Long floorId,
+                                            @RequestParam(required = false) String startTime,
+                                            @RequestParam(required = false) String endTime) {
+        return R.ok(reservationService.seatStatus(floorId, startTime, endTime));
     }
 
     /**

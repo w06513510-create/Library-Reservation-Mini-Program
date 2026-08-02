@@ -1,4 +1,4 @@
--- 图书馆预约系统 菜单 sys_menu（租户 000000）·_gen_menu.py 生成；id 段 12000+；幂等
+-- 图书馆预约系统 菜单 sys_menu·_gen_menu.py 生成；id 段 12000+；幂等
 SET NAMES utf8mb4;
 
 DELETE FROM sys_menu WHERE menu_id BETWEEN 12000 AND 12999;
@@ -7,6 +7,7 @@ INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 VALUES (12000, '图书馆管理', 0, 5, 'library', '', '', 1, 0, 'M', '0', '0', '', 'education', 103, 1, NOW(), NULL, NULL, '图书馆预约系统');
 
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, query_param, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES
+(12180, '平面图选座', 12000, 0, 'seatmap', 'library/seatmap/index', '', 1, 0, 'C', '0', '0', 'library:reservation:list', 'guide', 103, 1, NOW(), NULL, NULL, ''),
 (12010, '场馆管理', 12000, 1, 'venue', 'library/venue/index', '', 1, 0, 'C', '0', '0', 'library:venue:list', 'list', 103, 1, NOW(), NULL, NULL, ''),
 (12020, '楼层管理', 12000, 2, 'floor', 'library/floor/index', '', 1, 0, 'C', '0', '0', 'library:floor:list', 'tree', 103, 1, NOW(), NULL, NULL, ''),
 (12030, '区域管理', 12000, 3, 'area', 'library/area/index', '', 1, 0, 'C', '0', '0', 'library:area:list', 'tree-table', 103, 1, NOW(), NULL, NULL, ''),

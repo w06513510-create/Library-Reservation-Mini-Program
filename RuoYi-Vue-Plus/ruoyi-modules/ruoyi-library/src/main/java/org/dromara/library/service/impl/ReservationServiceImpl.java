@@ -11,14 +11,20 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.library.domain.*;
 import org.dromara.library.domain.bo.ReservationBo;
 import org.dromara.library.domain.vo.ReservationVo;
+import org.dromara.library.domain.vo.SeatStatusVo;
 import org.dromara.library.mapper.*;
 import org.dromara.library.service.ICreditService;
 import org.dromara.library.service.IReservationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 座位预约状态机Service实现
@@ -80,15 +86,15 @@ public class ReservationServiceImpl implements IReservationService {
                 throw new ServiceException("该读者信用分过低（<" + BLACKLIST_SCORE + "），暂停预约");
             }
         }
-        // 2. 座位可用性
-        Seat seat = seatMapper.selectById(bo.getSeatId());
+        // 2. 座位可用性（悲观行锁：锁住该座位行，串行化同座并发约座，杜绝重复占用）
+        Seat seat = seatMapper.selectForUpdate(bo.getSeatId());
         if (seat == null) {
             throw new ServiceException("座位不存在");
         }
         if (seat.getStatus() != null && seat.getStatus() != 0) {
             throw new ServiceException("座位已停用，无法预约");
         }
-        // 3. 座位资源不变式：同座同时段至多一条有效占用（状态 0/1/2）
+        // 3. 座位资源不变式：同座同时段至多一条有效占用（状态 0/1/2）；行锁下检查+插入原子，防并发双订
         Long occupied = baseMapper.selectCount(Wrappers.<Reservation>lambdaQuery()
             .eq(Reservation::getSeatId, bo.getSeatId())
             .in(Reservation::getStatus, 0, 1, 2)
@@ -247,6 +253,49 @@ public class ReservationServiceImpl implements IReservationService {
             throw new ServiceException("当前状态无法强制释放");
         }
         return true;
+    }
+
+    @Override
+    public List<SeatStatusVo> seatStatus(Long floorId, String start, String end) {
+        List<SeatStatusVo> result = new ArrayList<>();
+        List<Area> areas = areaMapper.selectList(Wrappers.<Area>lambdaQuery().eq(Area::getFloorId, floorId));
+        if (areas.isEmpty()) {
+            return result;
+        }
+        Map<Long, String> areaNames = areas.stream().collect(Collectors.toMap(Area::getId, Area::getAreaName, (a, b) -> a));
+        List<Long> areaIds = areas.stream().map(Area::getId).collect(Collectors.toList());
+        List<Seat> seats = seatMapper.selectList(Wrappers.<Seat>lambdaQuery()
+            .in(Seat::getAreaId, areaIds).orderByAsc(Seat::getSeatNo));
+        if (seats.isEmpty()) {
+            return result;
+        }
+        List<Long> seatIds = seats.stream().map(Seat::getId).collect(Collectors.toList());
+        // 所选时段被占用的座位（有效占用 0待签到/1使用中/2暂离中，且时段重叠）
+        Set<Long> occupied = new HashSet<>();
+        if (start != null && !start.isBlank() && end != null && !end.isBlank()) {
+            // 时间用字符串与 datetime 列比较（MySQL 隐式转换），与手写 SQL 一致，避免 Date 经 JDBC 时区偏移
+            List<Reservation> active = baseMapper.selectList(Wrappers.<Reservation>lambdaQuery()
+                .in(Reservation::getSeatId, seatIds)
+                .in(Reservation::getStatus, 0, 1, 2)
+                .lt(Reservation::getStartTime, end)
+                .gt(Reservation::getEndTime, start));
+            active.forEach(r -> occupied.add(r.getSeatId()));
+        }
+        for (Seat s : seats) {
+            SeatStatusVo vo = new SeatStatusVo();
+            vo.setId(s.getId());
+            vo.setSeatNo(s.getSeatNo());
+            vo.setAreaId(s.getAreaId());
+            vo.setAreaName(areaNames.get(s.getAreaId()));
+            vo.setSeatType(s.getSeatType());
+            vo.setHasPower(s.getHasPower());
+            vo.setPosX(s.getPosX());
+            vo.setPosY(s.getPosY());
+            vo.setSeatStatus(s.getStatus());
+            vo.setOccupied(occupied.contains(s.getId()));
+            result.add(vo);
+        }
+        return result;
     }
 
 }

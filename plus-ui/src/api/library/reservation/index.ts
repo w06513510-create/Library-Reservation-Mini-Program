@@ -7,6 +7,11 @@ export const listReservation = (query?: ReservationQuery): AxiosPromise<Reservat
   return request({ url: '/library/reservation/list', method: 'get', params: query });
 };
 
+/** 平面图选座：某楼层各座位坐标 + 时段占用状态（亮点①） */
+export const getSeatStatus = (floorId: string | number, startTime?: string, endTime?: string): AxiosPromise<any[]> => {
+  return request({ url: '/library/reservation/seatStatus', method: 'get', params: { floorId, startTime, endTime } });
+};
+
 /** 预约详情 */
 export const getReservation = (id: string | number): AxiosPromise<ReservationVO> => {
   return request({ url: '/library/reservation/' + id, method: 'get' });
