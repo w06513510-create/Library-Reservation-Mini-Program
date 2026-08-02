@@ -29,6 +29,7 @@ public class LibraryAutoServiceImpl implements ILibraryAutoService {
     private final BookMapper bookMapper;
     private final ReaderMapper readerMapper;
     private final CreditLogMapper creditLogMapper;
+    private final SuperviseMapper superviseMapper;
     private final IViolationService violationService;
     private final ICreditService creditService;
 
@@ -154,6 +155,33 @@ public class LibraryAutoServiceImpl implements ILibraryAutoService {
             }
             if (logs.get(0).getCreateTime().before(decayThreshold)) {
                 creditService.changeCredit(rd.getUserId(), DECAY_SCORE, 10, "无违约时间衰减恢复", "decay", null);
+                n++;
+            }
+        }
+        return n;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int scanSuperviseTimeout() {
+        Date now = new Date();
+        List<Supervise> list = superviseMapper.selectList(Wrappers.<Supervise>lambdaQuery()
+            .eq(Supervise::getStatus, 0).lt(Supervise::getDeadline, now));
+        int n = 0;
+        for (Supervise s : list) {
+            int rows = superviseMapper.update(null, Wrappers.lambdaUpdate(Supervise.class)
+                .set(Supervise::getStatus, 2).set(Supervise::getResolveTime, new Date())
+                .eq(Supervise::getId, s.getId()).eq(Supervise::getStatus, 0));
+            if (rows == 1) {
+                // 被监督预约（使用中/暂离中）→ 已违约释放，并记"监督未落座"违约（type=3）
+                Reservation r = reservationMapper.selectById(s.getReservationId());
+                reservationMapper.update(null, Wrappers.lambdaUpdate(Reservation.class)
+                    .set(Reservation::getStatus, 5).set(Reservation::getActualEndTime, new Date())
+                    .set(Reservation::getRemark, "占座监督超时未落座自动释放")
+                    .eq(Reservation::getId, s.getReservationId()).in(Reservation::getStatus, 1, 2));
+                if (r != null) {
+                    violationService.recordViolation(r.getReaderId(), 3, null, "supervise", s.getId(), 0);
+                }
                 n++;
             }
         }

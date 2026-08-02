@@ -28,7 +28,7 @@ public class LibraryAutoJobExecutor {
     private final IBlacklistService blacklistService;
 
     public ExecuteResult jobExecute(JobArgs jobArgs) {
-        int[] c = new int[7];
+        int[] c = new int[8];
         TenantHelper.dynamic("000000", () -> {
             c[0] = autoService.scanNoShow();
             c[1] = autoService.scanAwayTimeout();
@@ -37,9 +37,10 @@ public class LibraryAutoJobExecutor {
             c[4] = autoService.scanHoldExpired();
             c[5] = autoService.scanCreditDecay();
             c[6] = blacklistService.autoReleaseExpired();
+            c[7] = autoService.scanSuperviseTimeout();
         });
-        String msg = String.format("爽约释放%d 暂离超时%d 到期未签退%d 图书逾期%d 预约架超期%d 信用衰减%d 黑名单解除%d",
-            c[0], c[1], c[2], c[3], c[4], c[5], c[6]);
+        String msg = String.format("爽约释放%d 暂离超时%d 到期未签退%d 图书逾期%d 预约架超期%d 信用衰减%d 黑名单解除%d 监督超时%d",
+            c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7]);
         SnailJobLog.LOCAL.info("libraryAutoJob 执行完成：{}", msg);
         SnailJobLog.REMOTE.info("libraryAutoJob 执行完成：{}", msg);
         return ExecuteResult.success(msg);

@@ -26,4 +26,7 @@ public interface ILibraryAutoService {
     /** 信用分时间衰减恢复（无违约满周期 +分） */
     int scanCreditDecay();
 
+    /** 占座监督超时未落座：释放座位 + 记违约（监督未落座） */
+    int scanSuperviseTimeout();
+
 }
