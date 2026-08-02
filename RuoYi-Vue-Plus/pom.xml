@@ -350,6 +350,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!--  图书馆预约系统业务模块  -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-library</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!--  C端接入基座(app_user)  -->
             <dependency>
                 <groupId>org.dromara</groupId>

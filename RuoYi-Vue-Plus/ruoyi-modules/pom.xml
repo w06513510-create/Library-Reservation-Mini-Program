@@ -15,6 +15,7 @@
         <module>ruoyi-pay</module>
         <module>ruoyi-interaction</module>
         <module>ruoyi-demo</module>
+        <module>ruoyi-library</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-job</module>
         <module>ruoyi-system</module>

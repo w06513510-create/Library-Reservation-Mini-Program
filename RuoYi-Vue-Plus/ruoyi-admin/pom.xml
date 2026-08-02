@@ -116,6 +116,12 @@
             <artifactId>ruoyi-demo</artifactId>
         </dependency>
 
+        <!--  图书馆预约系统业务模块  -->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-library</artifactId>
+        </dependency>
+
         <!--  工作流模块  -->
         <dependency>
             <groupId>org.dromara</groupId>
