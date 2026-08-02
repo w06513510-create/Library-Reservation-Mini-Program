@@ -1,4 +1,4 @@
--- 图书馆预约系统 菜单 sys_menu（租户 000000）·由 _gen_menu.py 生成；id 段 12000+；幂等
+-- 图书馆预约系统 菜单 sys_menu（租户 000000）·_gen_menu.py 生成；id 段 12000+；幂等
 SET NAMES utf8mb4;
 
 DELETE FROM sys_menu WHERE menu_id BETWEEN 12000 AND 12999;
@@ -20,7 +20,10 @@ INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 (12110, '读者档案', 12000, 11, 'reader', 'library/reader/index', '', 1, 0, 'C', '0', '0', 'library:reader:list', 'star', 103, 1, NOW(), NULL, NULL, ''),
 (12120, '座位预约', 12000, 12, 'reservation', 'library/reservation/index', '', 1, 0, 'C', '0', '0', 'library:reservation:list', 'checkbox', 103, 1, NOW(), NULL, NULL, ''),
 (12130, '借阅管理', 12000, 13, 'loan', 'library/loan/index', '', 1, 0, 'C', '0', '0', 'library:loan:list', 'list', 103, 1, NOW(), NULL, NULL, ''),
-(12140, '图书预约', 12000, 14, 'hold', 'library/hold/index', '', 1, 0, 'C', '0', '0', 'library:hold:list', 'guide', 103, 1, NOW(), NULL, NULL, '');
+(12140, '图书预约', 12000, 14, 'hold', 'library/hold/index', '', 1, 0, 'C', '0', '0', 'library:hold:list', 'guide', 103, 1, NOW(), NULL, NULL, ''),
+(12150, '违约记录', 12000, 15, 'violation', 'library/violation/index', '', 1, 0, 'C', '0', '0', 'library:violation:list', 'documentation', 103, 1, NOW(), NULL, NULL, ''),
+(12160, '违约申诉', 12000, 16, 'appeal', 'library/appeal/index', '', 1, 0, 'C', '0', '0', 'library:appeal:list', 'clipboard', 103, 1, NOW(), NULL, NULL, ''),
+(12170, '黑名单', 12000, 17, 'blacklist', 'library/blacklist/index', '', 1, 0, 'C', '0', '0', 'library:blacklist:list', 'star', 103, 1, NOW(), NULL, NULL, '');
 
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, query_param, is_frame, is_cache, menu_type, visible, status, perms, icon, create_dept, create_by, create_time, update_by, update_time, remark) VALUES
 (12011, '场馆查询', 12010, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:venue:query', '#', 103, 1, NOW(), NULL, NULL, ''),
@@ -88,4 +91,15 @@ INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 (12141, '图书预约查询', 12140, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:hold:query', '#', 103, 1, NOW(), NULL, NULL, ''),
 (12142, '图书预约预约', 12140, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:hold:add', '#', 103, 1, NOW(), NULL, NULL, ''),
 (12143, '图书预约办理', 12140, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:hold:manage', '#', 103, 1, NOW(), NULL, NULL, ''),
-(12144, '图书预约导出', 12140, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:hold:export', '#', 103, 1, NOW(), NULL, NULL, '');
+(12144, '图书预约导出', 12140, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:hold:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12151, '违约记录查询', 12150, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:violation:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12152, '违约记录登记', 12150, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:violation:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12153, '违约记录导出', 12150, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:violation:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12161, '违约申诉查询', 12160, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:appeal:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12162, '违约申诉提交', 12160, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:appeal:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12163, '违约申诉审批', 12160, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:appeal:audit', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12164, '违约申诉导出', 12160, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:appeal:export', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12171, '黑名单查询', 12170, 1, '', '', '', 1, 0, 'F', '0', '0', 'library:blacklist:query', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12172, '黑名单加入', 12170, 2, '', '', '', 1, 0, 'F', '0', '0', 'library:blacklist:add', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12173, '黑名单解除', 12170, 3, '', '', '', 1, 0, 'F', '0', '0', 'library:blacklist:manage', '#', 103, 1, NOW(), NULL, NULL, ''),
+(12174, '黑名单导出', 12170, 4, '', '', '', 1, 0, 'F', '0', '0', 'library:blacklist:export', '#', 103, 1, NOW(), NULL, NULL, '');

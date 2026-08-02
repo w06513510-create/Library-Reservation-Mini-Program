@@ -78,6 +78,12 @@
             <artifactId>ruoyi-message</artifactId>
         </dependency>
 
+        <!-- 定时任务：SnailJob 客户端（@JobExecutor）-->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-common-job</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
