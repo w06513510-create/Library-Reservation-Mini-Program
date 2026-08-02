@@ -33,8 +33,8 @@
             <svg-icon class-name="search-icon" icon-class="search" />
           </div>
         </el-tooltip>
-        <!-- 消息 -->
-        <el-tooltip :content="proxy.$t('navbar.message')" effect="dark" placement="bottom">
+        <!-- 去RuoYi化：顶栏消息铃铛读 sys_notice 系统公告，已隐藏（业务站内信见小程序端） -->
+        <el-tooltip v-if="false" :content="proxy.$t('navbar.message')" effect="dark" placement="bottom">
           <div style="display:flex;align-items:center">
             <el-popover placement="bottom" trigger="click" transition="el-zoom-in-top" :width="300" :persistent="false">
               <template #reference>

@@ -68,7 +68,7 @@
     </el-form>
     <!--  底部  -->
     <div class="el-register-footer">
-      <span>Copyright © 2026 XX系统 · 毕业设计作品 All Rights Reserved.</span>
+      <span>Copyright © 2026 图书馆预约系统 · 毕业设计作品 All Rights Reserved.</span>
     </div>
   </div>
 </template>
