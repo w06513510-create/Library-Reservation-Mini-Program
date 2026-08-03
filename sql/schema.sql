@@ -72,16 +72,46 @@ CREATE TABLE `biz_area` (
   KEY `idx_area_floor` (`floor_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='区域';
 
+-- 桌子（工位组）：区域 → 桌子 → 座位 三级空间模型的中间层。真实自习室一桌坐 N 人（清华/南开/复旦等）。
+DROP TABLE IF EXISTS `biz_desk`;
+CREATE TABLE `biz_desk` (
+  `id`          bigint       NOT NULL                 COMMENT '桌子ID',
+  `tenant_id`   varchar(20)  DEFAULT '000000'         COMMENT '租户编号',
+  `area_id`     bigint       NOT NULL                 COMMENT '所属区域ID（biz_area）',
+  `desk_no`     varchar(30)  NOT NULL                 COMMENT '桌号（区域内唯一，如 D01；扫桌面二维码定位到桌）',
+  `capacity`    tinyint      DEFAULT 4                COMMENT '容量（座位数）：1单人 2双人 4四人 6六人',
+  `shape`       tinyint      DEFAULT 0                COMMENT '桌形：0矩形 1圆 2吧台',
+  `pos_x`       int          DEFAULT 0                COMMENT '平面图X坐标（桌子左上角绝对坐标）',
+  `pos_y`       int          DEFAULT 0                COMMENT '平面图Y坐标（桌子左上角绝对坐标）',
+  `width`       int          DEFAULT 150              COMMENT '平面图宽度（px）',
+  `height`      int          DEFAULT 120              COMMENT '平面图高度（px）',
+  `rotation`    int          DEFAULT 0                COMMENT '旋转角度（度，0不旋转）',
+  `sort`        int          DEFAULT 0                COMMENT '排序',
+  `status`      tinyint      DEFAULT 0                COMMENT '状态：0正常 1停用',
+  `create_dept` bigint       DEFAULT NULL             COMMENT '创建部门',
+  `create_by`   bigint       DEFAULT NULL             COMMENT '创建者',
+  `create_time` datetime     DEFAULT NULL             COMMENT '创建时间',
+  `update_by`   bigint       DEFAULT NULL             COMMENT '更新者',
+  `update_time` datetime     DEFAULT NULL             COMMENT '更新时间',
+  `del_flag`    char(1)      DEFAULT '0'              COMMENT '删除标志（0存在 1删除）',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_desk_area_no` (`area_id`, `desk_no`, `tenant_id`),
+  KEY `idx_desk_area` (`area_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='桌子（工位组）';
+
 DROP TABLE IF EXISTS `biz_seat`;
 CREATE TABLE `biz_seat` (
   `id`          bigint       NOT NULL                 COMMENT '座位ID',
   `tenant_id`   varchar(20)  DEFAULT '000000'         COMMENT '租户编号',
   `area_id`     bigint       NOT NULL                 COMMENT '所属区域ID（biz_area）',
-  `seat_no`     varchar(30)  NOT NULL                 COMMENT '座位编号（区域内唯一，如 A-012）',
+  `desk_id`     bigint       DEFAULT NULL             COMMENT '所属桌子ID（biz_desk；三级空间模型）',
+  `seat_no`     varchar(30)  NOT NULL                 COMMENT '座位编号（区域内唯一，如 D01-1）',
   `seat_type`   tinyint      DEFAULT 0                COMMENT '座位类型：0普通 1靠窗 2沙发 3单间',
   `has_power`   tinyint      DEFAULT 0                COMMENT '有无插座：0无 1有',
-  `pos_x`       int          DEFAULT 0                COMMENT '平面图X坐标（亮点①选座）',
-  `pos_y`       int          DEFAULT 0                COMMENT '平面图Y坐标（亮点①选座）',
+  `pos_x`       int          DEFAULT 0                COMMENT '平面图X坐标（绝对；= 桌子pos_x + offset_x，冗余便于兼容）',
+  `pos_y`       int          DEFAULT 0                COMMENT '平面图Y坐标（绝对；= 桌子pos_y + offset_y，冗余便于兼容）',
+  `offset_x`    int          DEFAULT 0                COMMENT '相对所属桌子左上角的X偏移（px；配桌时座位成组排布）',
+  `offset_y`    int          DEFAULT 0                COMMENT '相对所属桌子左上角的Y偏移（px）',
   `qr_code`     varchar(64)  DEFAULT NULL             COMMENT '桌面二维码标识（扫码签到用）',
   `status`      tinyint      DEFAULT 0                COMMENT '状态：0正常 1停用（是否可被预约；实时占用由预约单推导）',
   `create_dept` bigint       DEFAULT NULL             COMMENT '创建部门',
@@ -92,7 +122,8 @@ CREATE TABLE `biz_seat` (
   `del_flag`    char(1)      DEFAULT '0'              COMMENT '删除标志（0存在 1删除）',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_seat_area_no` (`area_id`, `seat_no`, `tenant_id`),
-  KEY `idx_seat_area` (`area_id`)
+  KEY `idx_seat_area` (`area_id`),
+  KEY `idx_seat_desk` (`desk_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='座位';
 
 DROP TABLE IF EXISTS `biz_room`;

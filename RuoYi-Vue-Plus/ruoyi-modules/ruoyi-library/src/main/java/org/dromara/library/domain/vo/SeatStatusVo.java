@@ -35,10 +35,10 @@ public class SeatStatusVo implements Serializable {
     /** 有无插座：0无 1有 */
     private Integer hasPower;
 
-    /** 平面图X坐标 */
+    /** 平面图X坐标（座位绝对坐标） */
     private Integer posX;
 
-    /** 平面图Y坐标 */
+    /** 平面图Y坐标（座位绝对坐标） */
     private Integer posY;
 
     /** 座位基础状态：0正常 1停用 */
@@ -46,5 +46,40 @@ public class SeatStatusVo implements Serializable {
 
     /** 所选时段是否被占用（待签到/使用中/暂离中） */
     private Boolean occupied;
+
+    // ===== 所属桌子（工位组）信息：供平面图「一桌展开多座」成组渲染 =====
+
+    /** 所属桌子ID */
+    private Long deskId;
+
+    /** 桌号（如 D01） */
+    private String deskNo;
+
+    /** 桌子容量 */
+    private Integer capacity;
+
+    /** 桌形：0矩形 1圆 2吧台 */
+    private Integer shape;
+
+    /** 桌子平面图X坐标（左上角绝对坐标） */
+    private Integer deskPosX;
+
+    /** 桌子平面图Y坐标（左上角绝对坐标） */
+    private Integer deskPosY;
+
+    /** 桌子宽度（px） */
+    private Integer deskWidth;
+
+    /** 桌子高度（px） */
+    private Integer deskHeight;
+
+    /** 桌子旋转角度（度） */
+    private Integer deskRotation;
+
+    /** 座位相对桌子左上角X偏移（px） */
+    private Integer offsetX;
+
+    /** 座位相对桌子左上角Y偏移（px） */
+    private Integer offsetY;
 
 }

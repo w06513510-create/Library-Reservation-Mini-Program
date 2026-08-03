@@ -10,20 +10,20 @@ import lombok.EqualsAndHashCode;
 import java.io.Serial;
 
 /**
- * 座位对象 biz_seat
+ * 桌子对象 biz_desk
  *
  * @author library
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("biz_seat")
-public class Seat extends TenantEntity {
+@TableName("biz_desk")
+public class Desk extends TenantEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 座位ID
+     * 桌子ID
      */
     @TableId(value = "id")
     private Long id;
@@ -34,24 +34,19 @@ public class Seat extends TenantEntity {
     private Long areaId;
 
     /**
-     * 所属桌子ID（biz_desk；三级空间模型）
+     * 桌号（如 D01）
      */
-    private Long deskId;
+    private String deskNo;
 
     /**
-     * 座位编号（区域内唯一，如 D01-1）
+     * 容量：1单人 2双人 4四人 6六人
      */
-    private String seatNo;
+    private Integer capacity;
 
     /**
-     * 座位类型：0普通 1靠窗 2沙发 3单间
+     * 桌形：0矩形 1圆 2吧台
      */
-    private Integer seatType;
-
-    /**
-     * 有无插座：0无 1有
-     */
-    private Integer hasPower;
+    private Integer shape;
 
     /**
      * 平面图X坐标
@@ -64,19 +59,24 @@ public class Seat extends TenantEntity {
     private Integer posY;
 
     /**
-     * 相对所属桌子左上角的X偏移（px）
+     * 平面图宽度
      */
-    private Integer offsetX;
+    private Integer width;
 
     /**
-     * 相对所属桌子左上角的Y偏移（px）
+     * 平面图高度
      */
-    private Integer offsetY;
+    private Integer height;
 
     /**
-     * 桌面二维码标识（扫码签到用）
+     * 旋转角度
      */
-    private String qrCode;
+    private Integer rotation;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
 
     /**
      * 状态：0正常 1停用

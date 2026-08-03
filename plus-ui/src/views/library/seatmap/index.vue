@@ -32,7 +32,7 @@
         <span class="lg"><i class="dot occupied"></i>已占用 {{ stat.occupied }}</span>
         <span class="lg"><i class="dot selected"></i>已选</span>
         <span class="lg"><i class="dot disabled"></i>停用 {{ stat.disabled }}</span>
-        <span class="lg-tip">⚡=有插座　类型：普通/靠窗/沙发/单间　共 {{ seats.length }} 座</span>
+        <span class="lg-tip">⚡=有插座　类型：普通/靠窗/沙发/单间　共 {{ desks.length }} 桌 {{ seats.length }} 座</span>
       </div>
     </el-card>
 
@@ -42,6 +42,16 @@
         <div v-if="!floorId" class="floor-empty">请选择场馆与楼层查看平面图</div>
         <div v-else-if="seats.length === 0" class="floor-empty">该楼层暂无座位数据（可到「座位管理」维护坐标）</div>
         <div v-else class="floor-plan" :style="planStyle">
+          <!-- 桌子层（工位组）：一桌展开多座，成组呈现 -->
+          <div
+            v-for="d in desks"
+            :key="'desk-' + d.id"
+            class="desk"
+            :class="'shape-' + (d.shape || 0)"
+            :style="{ left: d.posX + 'px', top: d.posY + 'px', width: d.width + 'px', height: d.height + 'px', transform: d.rotation ? 'rotate(' + d.rotation + 'deg)' : undefined }"
+          >
+            <span class="desk-no">{{ d.deskNo }}<em v-if="d.capacity">·{{ d.capacity }}人</em></span>
+          </div>
           <el-tooltip v-for="s in seats" :key="s.id" placement="top" :show-after="120">
             <template #content>
               <div>座位 {{ s.seatNo }} · {{ areaMap[s.areaId] || '' }}</div>
@@ -116,6 +126,26 @@ const selectedFloor = computed(() => floorOptions.value.find((f) => f.id === flo
 const planStyle = computed(() => {
   const url = selectedFloor.value?.floorPlanUrl;
   return url ? { backgroundImage: `url(${url})`, backgroundSize: 'cover' } : {};
+});
+
+// 桌子层：从座位数据里按 deskId 归并出桌子几何，供平面图成组渲染
+const desks = computed(() => {
+  const map = new Map<any, any>();
+  for (const s of seats.value) {
+    if (s.deskId == null || map.has(s.deskId)) continue;
+    map.set(s.deskId, {
+      id: s.deskId,
+      deskNo: s.deskNo,
+      capacity: s.capacity,
+      shape: s.shape,
+      posX: s.deskPosX || 0,
+      posY: s.deskPosY || 0,
+      width: s.deskWidth || 150,
+      height: s.deskHeight || 110,
+      rotation: s.deskRotation || 0
+    });
+  }
+  return Array.from(map.values());
 });
 
 const stat = computed(() => {
@@ -288,8 +318,38 @@ onMounted(async () => {
   background-size: 40px 40px;
   overflow: auto;
 }
+.desk {
+  position: absolute;
+  z-index: 0;
+  border: 1.5px dashed #b6c2d6;
+  background: rgba(64, 158, 255, 0.06);
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+.desk.shape-1 {
+  border-radius: 50%;
+}
+.desk.shape-2 {
+  border-radius: 16px;
+  background: rgba(230, 162, 60, 0.08);
+  border-color: #e0c07a;
+}
+.desk-no {
+  position: absolute;
+  top: 3px;
+  left: 8px;
+  font-size: 11px;
+  color: #8a93a6;
+  font-weight: 600;
+}
+.desk-no em {
+  font-style: normal;
+  color: #aab2c0;
+  margin-left: 2px;
+}
 .seat {
   position: absolute;
+  z-index: 1;
   width: 50px;
   height: 40px;
   display: flex;

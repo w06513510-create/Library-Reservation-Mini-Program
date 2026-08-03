@@ -43,6 +43,7 @@ public class ReservationServiceImpl implements IReservationService {
     private final AreaMapper areaMapper;
     private final FloorMapper floorMapper;
     private final ReaderMapper readerMapper;
+    private final DeskMapper deskMapper;
     private final ICreditService creditService;
     private final RuleConfigHelper ruleConfig;
 
@@ -291,6 +292,13 @@ public class ReservationServiceImpl implements IReservationService {
             return result;
         }
         List<Long> seatIds = seats.stream().map(Seat::getId).collect(Collectors.toList());
+        // 所属桌子（工位组）：一次查出，供平面图「一桌展开多座」成组渲染
+        List<Long> deskIds = seats.stream().map(Seat::getDeskId).filter(java.util.Objects::nonNull).distinct().collect(Collectors.toList());
+        Map<Long, Desk> deskMap = new java.util.HashMap<>();
+        if (!deskIds.isEmpty()) {
+            deskMapper.selectList(Wrappers.<Desk>lambdaQuery().in(Desk::getId, deskIds))
+                .forEach(d -> deskMap.put(d.getId(), d));
+        }
         // 所选时段被占用的座位（有效占用 0待签到/1使用中/2暂离中，且时段重叠）
         Set<Long> occupied = new HashSet<>();
         if (start != null && !start.isBlank() && end != null && !end.isBlank()) {
@@ -312,8 +320,23 @@ public class ReservationServiceImpl implements IReservationService {
             vo.setHasPower(s.getHasPower());
             vo.setPosX(s.getPosX());
             vo.setPosY(s.getPosY());
+            vo.setOffsetX(s.getOffsetX());
+            vo.setOffsetY(s.getOffsetY());
             vo.setSeatStatus(s.getStatus());
             vo.setOccupied(occupied.contains(s.getId()));
+            // 填充所属桌子几何信息
+            vo.setDeskId(s.getDeskId());
+            Desk desk = s.getDeskId() == null ? null : deskMap.get(s.getDeskId());
+            if (desk != null) {
+                vo.setDeskNo(desk.getDeskNo());
+                vo.setCapacity(desk.getCapacity());
+                vo.setShape(desk.getShape());
+                vo.setDeskPosX(desk.getPosX());
+                vo.setDeskPosY(desk.getPosY());
+                vo.setDeskWidth(desk.getWidth());
+                vo.setDeskHeight(desk.getHeight());
+                vo.setDeskRotation(desk.getRotation());
+            }
             result.add(vo);
         }
         return result;

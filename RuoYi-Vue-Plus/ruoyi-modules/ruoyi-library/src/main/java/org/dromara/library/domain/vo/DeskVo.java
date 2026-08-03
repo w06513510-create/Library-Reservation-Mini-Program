@@ -2,7 +2,7 @@ package org.dromara.library.domain.vo;
 
 import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
-import org.dromara.library.domain.Seat;
+import org.dromara.library.domain.Desk;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
@@ -11,22 +11,22 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 座位视图对象 biz_seat
+ * 桌子视图对象 biz_desk
  *
  * @author library
  */
 @Data
 @ExcelIgnoreUnannotated
-@AutoMapper(target = Seat.class)
-public class SeatVo implements Serializable {
+@AutoMapper(target = Desk.class)
+public class DeskVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 座位ID
+     * 桌子ID
      */
-    @ExcelProperty(value = "座位ID")
+    @ExcelProperty(value = "桌子ID")
     private Long id;
 
     /**
@@ -36,28 +36,22 @@ public class SeatVo implements Serializable {
     private Long areaId;
 
     /**
-     * 所属桌子ID（biz_desk）
+     * 桌号（如 D01）
      */
-    @ExcelProperty(value = "所属桌子ID")
-    private Long deskId;
+    @ExcelProperty(value = "桌号")
+    private String deskNo;
 
     /**
-     * 座位编号（区域内唯一，如 D01-1）
+     * 容量：1单人 2双人 4四人 6六人
      */
-    @ExcelProperty(value = "座位编号")
-    private String seatNo;
+    @ExcelProperty(value = "容量")
+    private Integer capacity;
 
     /**
-     * 座位类型：0普通 1靠窗 2沙发 3单间
+     * 桌形：0矩形 1圆 2吧台
      */
-    @ExcelProperty(value = "座位类型")
-    private Integer seatType;
-
-    /**
-     * 有无插座：0无 1有
-     */
-    @ExcelProperty(value = "有无插座")
-    private Integer hasPower;
+    @ExcelProperty(value = "桌形")
+    private Integer shape;
 
     /**
      * 平面图X坐标
@@ -72,22 +66,28 @@ public class SeatVo implements Serializable {
     private Integer posY;
 
     /**
-     * 相对所属桌子X偏移
+     * 平面图宽度
      */
-    @ExcelProperty(value = "相对桌子X偏移")
-    private Integer offsetX;
+    @ExcelProperty(value = "平面图宽度")
+    private Integer width;
 
     /**
-     * 相对所属桌子Y偏移
+     * 平面图高度
      */
-    @ExcelProperty(value = "相对桌子Y偏移")
-    private Integer offsetY;
+    @ExcelProperty(value = "平面图高度")
+    private Integer height;
 
     /**
-     * 桌面二维码标识（扫码签到用）
+     * 旋转角度
      */
-    @ExcelProperty(value = "桌面二维码标识")
-    private String qrCode;
+    @ExcelProperty(value = "旋转角度")
+    private Integer rotation;
+
+    /**
+     * 排序
+     */
+    @ExcelProperty(value = "排序")
+    private Integer sort;
 
     /**
      * 状态：0正常 1停用
