@@ -12,6 +12,7 @@ import org.dromara.library.domain.Reservation;
 import org.dromara.library.domain.Supervise;
 import org.dromara.library.domain.bo.SuperviseBo;
 import org.dromara.library.domain.vo.SuperviseVo;
+import org.dromara.library.helper.RuleConfigHelper;
 import org.dromara.library.mapper.ReservationMapper;
 import org.dromara.library.mapper.SuperviseMapper;
 import org.dromara.library.service.ISuperviseService;
@@ -35,9 +36,7 @@ public class SuperviseServiceImpl implements ISuperviseService {
 
     private final SuperviseMapper baseMapper;
     private final ReservationMapper reservationMapper;
-
-    /** 监督响应时长（分钟）：默认15分钟，后续可接 rule_config（如 SUPERVISE_RESPONSE_MINUTES） */
-    private static final int RESPONSE_MINUTES = 15;
+    private final RuleConfigHelper ruleConfig;
 
     @Override
     public SuperviseVo queryById(Long id) {
@@ -84,11 +83,12 @@ public class SuperviseServiceImpl implements ISuperviseService {
         if (count != null && count > 0) {
             throw new ServiceException("该座位已有进行中的监督");
         }
-        // 4. 组装并写入：座位由预约单推导，落座截止 = 现在 + 监督响应时长
+        // 4. 组装并写入：座位由预约单推导，落座截止 = 现在 + 监督响应时长（可配，默认20分钟对齐超星）
+        int responseMinutes = ruleConfig.getInt(RuleConfigHelper.GROUP_SEAT, "supervise_deadline_min", 20);
         Supervise add = MapstructUtils.convert(bo, Supervise.class);
         add.setSeatId(reservation.getSeatId());
         add.setReportTime(new Date());
-        add.setDeadline(new Date(System.currentTimeMillis() + RESPONSE_MINUTES * 60 * 1000L));
+        add.setDeadline(new Date(System.currentTimeMillis() + (long) responseMinutes * 60 * 1000L));
         add.setStatus(0);
         add.setResolveTime(null);
         return baseMapper.insert(add) > 0;

@@ -11,6 +11,7 @@ import org.dromara.library.domain.Blacklist;
 import org.dromara.library.domain.Reader;
 import org.dromara.library.domain.bo.BlacklistBo;
 import org.dromara.library.domain.vo.BlacklistVo;
+import org.dromara.library.helper.RuleConfigHelper;
 import org.dromara.library.mapper.BlacklistMapper;
 import org.dromara.library.mapper.ReaderMapper;
 import org.dromara.library.service.IBlacklistService;
@@ -33,9 +34,8 @@ public class BlacklistServiceImpl implements IBlacklistService {
     private final BlacklistMapper baseMapper;
     private final ReaderMapper readerMapper;
     private final ICreditService creditService;
+    private final RuleConfigHelper ruleConfig;
 
-    /** 解除黑名单后信用校准到的门槛分 */
-    private static final int RECOVER_SCORE = 60;
     private static final long DAY_MS = 24L * 3600 * 1000;
 
     @Override
@@ -88,7 +88,7 @@ public class BlacklistServiceImpl implements IBlacklistService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean addByBo(BlacklistBo bo) {
-        int days = bo.getDays() != null ? bo.getDays() : 7;
+        int days = bo.getDays() != null ? bo.getDays() : ruleConfig.getInt(RuleConfigHelper.GROUP_CREDIT, "ban_days", 7);
         return addToBlacklist(bo.getReaderId(), bo.getReason() == null ? "管理员手动加入" : bo.getReason(), days);
     }
 
@@ -110,7 +110,8 @@ public class BlacklistServiceImpl implements IBlacklistService {
             .set(Reader::getBlacklistFlag, 0).set(Reader::getBlacklistEndTime, null).set(Reader::getStatus, 0)
             .eq(Reader::getUserId, bl.getReaderId()));
         // 信用校准到门槛分（赋值型，按未clamp的 raw_sum 计算）
-        creditService.calibrateCredit(bl.getReaderId(), RECOVER_SCORE, "黑名单解除·校准门槛分", "blacklist", id);
+        int recoverScore = ruleConfig.getInt(RuleConfigHelper.GROUP_CREDIT, "recover_score", 60);
+        creditService.calibrateCredit(bl.getReaderId(), recoverScore, "黑名单解除·校准门槛分", "blacklist", id);
         return true;
     }
 

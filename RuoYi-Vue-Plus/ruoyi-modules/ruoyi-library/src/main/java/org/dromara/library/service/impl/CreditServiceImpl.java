@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.dromara.library.domain.CreditLog;
 import org.dromara.library.domain.Reader;
+import org.dromara.library.helper.RuleConfigHelper;
 import org.dromara.library.mapper.CreditLogMapper;
 import org.dromara.library.mapper.ReaderMapper;
 import org.dromara.library.service.ICreditService;
@@ -24,6 +25,7 @@ public class CreditServiceImpl implements ICreditService {
 
     private final CreditLogMapper creditLogMapper;
     private final ReaderMapper readerMapper;
+    private final RuleConfigHelper ruleConfig;
 
     @Override
     public Reader ensureReader(Long readerId) {
@@ -32,7 +34,7 @@ public class CreditServiceImpl implements ICreditService {
             reader = new Reader();
             reader.setUserId(readerId);
             reader.setStudentNo("U" + readerId);
-            reader.setCreditScore(100);
+            reader.setCreditScore(ruleConfig.getInt(RuleConfigHelper.GROUP_CREDIT, "init_score", 100));
             reader.setPerformCount(0);
             reader.setBlacklistFlag(0);
             reader.setStatus(0);
@@ -65,7 +67,8 @@ public class CreditServiceImpl implements ICreditService {
     private void seedIfNeeded(Reader reader) {
         Long count = creditLogMapper.selectCount(Wrappers.<CreditLog>lambdaQuery().eq(CreditLog::getReaderId, reader.getUserId()));
         if (count == null || count == 0L) {
-            int seed = reader.getCreditScore() == null ? 100 : reader.getCreditScore();
+            int initScore = ruleConfig.getInt(RuleConfigHelper.GROUP_CREDIT, "init_score", 100);
+            int seed = reader.getCreditScore() == null ? initScore : reader.getCreditScore();
             writeLog(reader.getUserId(), seed, 1, "建档", "reader", reader.getId(), clamp(seed));
         }
     }
@@ -98,7 +101,9 @@ public class CreditServiceImpl implements ICreditService {
     }
 
     private int clamp(int v) {
-        return Math.max(0, Math.min(100, v));
+        int min = ruleConfig.getInt(RuleConfigHelper.GROUP_CREDIT, "score_min", 0);
+        int max = ruleConfig.getInt(RuleConfigHelper.GROUP_CREDIT, "score_max", 100);
+        return Math.max(min, Math.min(max, v));
     }
 
 }

@@ -3,6 +3,7 @@ package org.dromara.library.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.dromara.library.domain.*;
+import org.dromara.library.helper.RuleConfigHelper;
 import org.dromara.library.mapper.*;
 import org.dromara.library.service.ICreditService;
 import org.dromara.library.service.ILibraryAutoService;
@@ -10,6 +11,7 @@ import org.dromara.library.service.IViolationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -32,19 +34,16 @@ public class LibraryAutoServiceImpl implements ILibraryAutoService {
     private final SuperviseMapper superviseMapper;
     private final IViolationService violationService;
     private final ICreditService creditService;
+    private final RuleConfigHelper ruleConfig;
 
     private static final long MIN_MS = 60 * 1000L;
     private static final long DAY_MS = 24L * 3600 * 1000;
-    private static final int CHECKIN_WINDOW_MIN = 20;
-    private static final int AWAY_MIN = 20;
-    private static final int GRACE_MIN = 10;
-    private static final int DECAY_DAYS = 30;
-    private static final int DECAY_SCORE = 5;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int scanNoShow() {
-        Date threshold = new Date(System.currentTimeMillis() - CHECKIN_WINDOW_MIN * MIN_MS);
+        int checkinWindowMin = ruleConfig.getInt(RuleConfigHelper.GROUP_SEAT, "checkin_window_min", 30);
+        Date threshold = new Date(System.currentTimeMillis() - (long) checkinWindowMin * MIN_MS);
         List<Reservation> list = reservationMapper.selectList(Wrappers.<Reservation>lambdaQuery()
             .eq(Reservation::getStatus, 0).lt(Reservation::getStartTime, threshold));
         int n = 0;
@@ -63,11 +62,17 @@ public class LibraryAutoServiceImpl implements ILibraryAutoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int scanAwayTimeout() {
-        Date threshold = new Date(System.currentTimeMillis() - AWAY_MIN * MIN_MS);
+        int awayKeepMin = ruleConfig.getInt(RuleConfigHelper.GROUP_SEAT, "away_keep_min", 30);
+        long now = System.currentTimeMillis();
+        // 取所有暂离中的预约，逐单按「暂离起始时刻是否落在就餐时段」决定保留时长（就餐时段更久）
         List<Reservation> list = reservationMapper.selectList(Wrappers.<Reservation>lambdaQuery()
-            .eq(Reservation::getStatus, 2).lt(Reservation::getAwayStartTime, threshold));
+            .eq(Reservation::getStatus, 2).isNotNull(Reservation::getAwayStartTime));
         int n = 0;
         for (Reservation r : list) {
+            int keepMin = effectiveKeepMinutes(r.getAwayStartTime(), awayKeepMin);
+            if (now - r.getAwayStartTime().getTime() < (long) keepMin * MIN_MS) {
+                continue; // 尚在保留期内
+            }
             int rows = reservationMapper.update(null, Wrappers.lambdaUpdate(Reservation.class)
                 .set(Reservation::getStatus, 5).set(Reservation::getRemark, "暂离超时自动释放")
                 .eq(Reservation::getId, r.getId()).eq(Reservation::getStatus, 2));
@@ -82,11 +87,17 @@ public class LibraryAutoServiceImpl implements ILibraryAutoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int scanExpired() {
-        Date threshold = new Date(System.currentTimeMillis() - GRACE_MIN * MIN_MS);
+        int graceMin = ruleConfig.getInt(RuleConfigHelper.GROUP_SEAT, "overdue_grace_min", 10);
+        long now = System.currentTimeMillis();
+        // 取所有已到结束时间但仍占用的预约，逐单按「应签退时刻是否落在就餐时段」决定宽限（就餐时段更久）
         List<Reservation> list = reservationMapper.selectList(Wrappers.<Reservation>lambdaQuery()
-            .in(Reservation::getStatus, 1, 2).lt(Reservation::getEndTime, threshold));
+            .in(Reservation::getStatus, 1, 2).lt(Reservation::getEndTime, new Date()));
         int n = 0;
         for (Reservation r : list) {
+            int keepMin = effectiveKeepMinutes(r.getEndTime(), graceMin);
+            if (r.getEndTime() != null && now - r.getEndTime().getTime() < (long) keepMin * MIN_MS) {
+                continue; // 尚在宽限期内
+            }
             int rows = reservationMapper.update(null, Wrappers.lambdaUpdate(Reservation.class)
                 .set(Reservation::getStatus, 5).set(Reservation::getActualEndTime, new Date()).set(Reservation::getRemark, "到期未签退自动释放")
                 .eq(Reservation::getId, r.getId()).in(Reservation::getStatus, 1, 2));
@@ -143,8 +154,11 @@ public class LibraryAutoServiceImpl implements ILibraryAutoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int scanCreditDecay() {
-        Date decayThreshold = new Date(System.currentTimeMillis() - (long) DECAY_DAYS * DAY_MS);
-        List<Reader> readers = readerMapper.selectList(Wrappers.<Reader>lambdaQuery().lt(Reader::getCreditScore, 100));
+        int decayDays = ruleConfig.getInt(RuleConfigHelper.GROUP_CREDIT, "decay_days", 30);
+        int decayScore = ruleConfig.getInt(RuleConfigHelper.GROUP_CREDIT, "decay_score", 5);
+        int scoreMax = ruleConfig.getInt(RuleConfigHelper.GROUP_CREDIT, "score_max", 100);
+        Date decayThreshold = new Date(System.currentTimeMillis() - (long) decayDays * DAY_MS);
+        List<Reader> readers = readerMapper.selectList(Wrappers.<Reader>lambdaQuery().lt(Reader::getCreditScore, scoreMax));
         int n = 0;
         for (Reader rd : readers) {
             // 最近一次信用变动早于衰减周期（即已稳定满周期无扣分）才回补
@@ -154,11 +168,35 @@ public class LibraryAutoServiceImpl implements ILibraryAutoService {
                 continue;
             }
             if (logs.get(0).getCreateTime().before(decayThreshold)) {
-                creditService.changeCredit(rd.getUserId(), DECAY_SCORE, 10, "无违约时间衰减恢复", "decay", null);
+                creditService.changeCredit(rd.getUserId(), decayScore, 10, "无违约时间衰减恢复", "decay", null);
                 n++;
             }
         }
         return n;
+    }
+
+    /**
+     * 就餐时段特殊保留：refTime（暂离起始 / 应签退时刻）落在午餐或晚餐窗口内时，返回该餐段配置的保留时长，
+     * 否则返回普通时长。参考真实馆规——南开/华师大/清华/武大/北师大/哈工大等普遍设就餐延长保留。
+     */
+    private int effectiveKeepMinutes(Date refTime, int normalKeep) {
+        if (refTime == null) {
+            return normalKeep;
+        }
+        Calendar c = Calendar.getInstance();
+        c.setTime(refTime);
+        int minuteOfDay = c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE);
+        Integer ls = ruleConfig.getMinuteOfDay(RuleConfigHelper.GROUP_SEAT, "lunch_start");
+        Integer le = ruleConfig.getMinuteOfDay(RuleConfigHelper.GROUP_SEAT, "lunch_end");
+        if (ls != null && le != null && minuteOfDay >= ls && minuteOfDay < le) {
+            return ruleConfig.getInt(RuleConfigHelper.GROUP_SEAT, "lunch_keep_min", normalKeep);
+        }
+        Integer ds = ruleConfig.getMinuteOfDay(RuleConfigHelper.GROUP_SEAT, "dinner_start");
+        Integer de = ruleConfig.getMinuteOfDay(RuleConfigHelper.GROUP_SEAT, "dinner_end");
+        if (ds != null && de != null && minuteOfDay >= ds && minuteOfDay < de) {
+            return ruleConfig.getInt(RuleConfigHelper.GROUP_SEAT, "dinner_keep_min", normalKeep);
+        }
+        return normalKeep;
     }
 
     @Override

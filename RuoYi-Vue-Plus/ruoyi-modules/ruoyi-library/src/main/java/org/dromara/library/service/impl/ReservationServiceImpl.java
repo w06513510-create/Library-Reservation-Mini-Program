@@ -12,12 +12,14 @@ import org.dromara.library.domain.*;
 import org.dromara.library.domain.bo.ReservationBo;
 import org.dromara.library.domain.vo.ReservationVo;
 import org.dromara.library.domain.vo.SeatStatusVo;
+import org.dromara.library.helper.RuleConfigHelper;
 import org.dromara.library.mapper.*;
 import org.dromara.library.service.ICreditService;
 import org.dromara.library.service.IReservationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -42,9 +44,7 @@ public class ReservationServiceImpl implements IReservationService {
     private final FloorMapper floorMapper;
     private final ReaderMapper readerMapper;
     private final ICreditService creditService;
-
-    /** 信用阈值：低于此分暂停预约 */
-    private static final int BLACKLIST_SCORE = 20;
+    private final RuleConfigHelper ruleConfig;
 
     @Override
     public ReservationVo queryById(Long id) {
@@ -82,8 +82,9 @@ public class ReservationServiceImpl implements IReservationService {
             if (reader.getBlacklistFlag() != null && reader.getBlacklistFlag() == 1) {
                 throw new ServiceException("该读者在黑名单中，暂停预约");
             }
-            if (reader.getCreditScore() != null && reader.getCreditScore() < BLACKLIST_SCORE) {
-                throw new ServiceException("该读者信用分过低（<" + BLACKLIST_SCORE + "），暂停预约");
+            int pauseScore = ruleConfig.getInt(RuleConfigHelper.GROUP_CREDIT, "pause_score", 20);
+            if (reader.getCreditScore() != null && reader.getCreditScore() < pauseScore) {
+                throw new ServiceException("该读者信用分过低（<" + pauseScore + "），暂停预约");
             }
         }
         // 2. 座位可用性（悲观行锁：锁住该座位行，串行化同座并发约座，杜绝重复占用）
@@ -189,8 +190,11 @@ public class ReservationServiceImpl implements IReservationService {
         if (rows != 1) {
             throw new ServiceException("当前状态无法退座（需为使用中/暂离中）");
         }
-        // 履约加分 +1（事件触发，写信用流水）+ 守信次数 +1
-        creditService.changeCredit(r.getReaderId(), 1, 9, "按时退座履约", "reservation", id);
+        // 履约加分（事件触发，写信用流水）+ 守信次数 +1
+        int bonus = ruleConfig.getInt(RuleConfigHelper.GROUP_CREDIT, "perform_bonus", 1);
+        if (bonus != 0) {
+            creditService.changeCredit(r.getReaderId(), bonus, 9, "按时退座履约", "reservation", id);
+        }
         readerMapper.update(null, Wrappers.lambdaUpdate(Reader.class)
             .setSql("perform_count = IFNULL(perform_count, 0) + 1")
             .eq(Reader::getUserId, r.getReaderId()));
@@ -200,6 +204,23 @@ public class ReservationServiceImpl implements IReservationService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean cancel(Long id) {
+        Reservation r = baseMapper.selectById(id);
+        if (r == null) {
+            throw new ServiceException("预约单不存在");
+        }
+        // 每日取消上限：同一读者当日已取消次数达上限则拒绝（对齐真实馆规，如华师大/贵医；0=不限）
+        int dailyLimit = ruleConfig.getInt(RuleConfigHelper.GROUP_SEAT, "daily_cancel_limit", 2);
+        if (dailyLimit > 0) {
+            // 用字符串与 datetime 列比较，避免 Date 经 JDBC 时区偏移（与 seatStatus 一致）
+            String todayStart = new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + " 00:00:00";
+            Long cancelledToday = baseMapper.selectCount(Wrappers.<Reservation>lambdaQuery()
+                .eq(Reservation::getReaderId, r.getReaderId())
+                .eq(Reservation::getStatus, 4)
+                .ge(Reservation::getCancelTime, todayStart));
+            if (cancelledToday != null && cancelledToday >= dailyLimit) {
+                throw new ServiceException("今日取消预约次数已达上限（" + dailyLimit + " 次），请明日再试");
+            }
+        }
         int rows = baseMapper.update(null, Wrappers.lambdaUpdate(Reservation.class)
             .set(Reservation::getStatus, 4)
             .set(Reservation::getCancelTime, new Date())

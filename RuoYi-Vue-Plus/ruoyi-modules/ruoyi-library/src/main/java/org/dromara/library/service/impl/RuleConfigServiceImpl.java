@@ -11,6 +11,7 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.library.domain.RuleConfig;
 import org.dromara.library.domain.bo.RuleConfigBo;
 import org.dromara.library.domain.vo.RuleConfigVo;
+import org.dromara.library.helper.RuleConfigHelper;
 import org.dromara.library.mapper.RuleConfigMapper;
 import org.dromara.library.service.IRuleConfigService;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import java.util.List;
 public class RuleConfigServiceImpl implements IRuleConfigService {
 
     private final RuleConfigMapper baseMapper;
+    private final RuleConfigHelper ruleConfigHelper;
 
     @Override
     public RuleConfigVo queryById(Long id) {
@@ -60,6 +62,7 @@ public class RuleConfigServiceImpl implements IRuleConfigService {
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
+            ruleConfigHelper.refresh();
         }
         return flag;
     }
@@ -67,12 +70,21 @@ public class RuleConfigServiceImpl implements IRuleConfigService {
     @Override
     public Boolean updateByBo(RuleConfigBo bo) {
         RuleConfig update = MapstructUtils.convert(bo, RuleConfig.class);
-        return baseMapper.updateById(update) > 0;
+        boolean flag = baseMapper.updateById(update) > 0;
+        if (flag) {
+            // 改了配置立即让缓存失效，下次业务读取即生效（前端「规则配置」真正生效的关键）
+            ruleConfigHelper.refresh();
+        }
+        return flag;
     }
 
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        return baseMapper.deleteByIds(ids) > 0;
+        boolean flag = baseMapper.deleteByIds(ids) > 0;
+        if (flag) {
+            ruleConfigHelper.refresh();
+        }
+        return flag;
     }
 
 }
