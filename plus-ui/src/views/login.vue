@@ -1,6 +1,52 @@
 <template>
   <div class="login">
-    <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
+    <!-- 左侧：暖阅读风品牌插画面板 -->
+    <div class="login-hero">
+      <div class="login-hero-inner">
+        <svg class="login-illus" viewBox="0 0 440 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="图书馆书架插画">
+          <circle cx="220" cy="118" r="132" fill="#cc785c" opacity="0.10" />
+          <circle cx="150" cy="86" r="72" fill="#e8a55a" opacity="0.12" />
+          <rect x="70" y="236" width="300" height="12" rx="6" fill="#3d3d3a" />
+          <rect x="78" y="248" width="284" height="6" rx="3" fill="#3d3d3a" opacity="0.25" />
+          <g stroke="#2c2a27" stroke-opacity="0.14">
+            <rect x="92" y="118" width="32" height="118" rx="4" fill="#cc785c" />
+            <rect x="126" y="86" width="26" height="150" rx="4" fill="#e8a55a" />
+            <rect x="154" y="132" width="30" height="104" rx="4" fill="#5db8a6" />
+            <rect x="186" y="98" width="24" height="138" rx="4" fill="#2c2a27" />
+            <rect x="212" y="116" width="30" height="120" rx="4" fill="#efe9de" />
+            <rect x="244" y="90" width="28" height="146" rx="4" fill="#cc785c" />
+            <rect x="274" y="126" width="32" height="110" rx="4" fill="#e8a55a" />
+            <rect x="308" y="104" width="24" height="132" rx="4" fill="#5db8a6" />
+          </g>
+          <g fill="#faf9f5" opacity="0.5">
+            <rect x="98" y="150" width="20" height="4" rx="2" />
+            <rect x="131" y="118" width="16" height="4" rx="2" />
+            <rect x="159" y="164" width="20" height="4" rx="2" />
+            <rect x="190" y="130" width="16" height="4" rx="2" />
+            <rect x="249" y="122" width="18" height="4" rx="2" />
+            <rect x="279" y="158" width="22" height="4" rx="2" />
+            <rect x="312" y="136" width="16" height="4" rx="2" />
+          </g>
+          <rect x="217" y="150" width="20" height="4" rx="2" fill="#2c2a27" opacity="0.4" />
+          <g>
+            <rect x="150" y="60" width="120" height="18" rx="5" fill="#faf9f5" stroke="#3d3d3a" stroke-opacity="0.2" />
+            <rect x="150" y="60" width="120" height="6" rx="3" fill="#cc785c" opacity="0.85" />
+            <rect x="248" y="60" width="10" height="34" fill="#cc785c" />
+            <path d="M248 94 l5 -8 l5 8 z" fill="#a9583e" />
+          </g>
+          <circle cx="360" cy="70" r="4" fill="#e8a55a" />
+          <circle cx="96" cy="70" r="3" fill="#cc785c" />
+          <circle cx="386" cy="150" r="3" fill="#5db8a6" />
+        </svg>
+        <div class="login-hero-title">图书馆预约系统</div>
+        <div class="login-hero-sub">座位 · 自习室预约 · 图书借阅流通 · 信用管理</div>
+        <div class="login-hero-tags">
+          <span>可视化选座</span><span>信用分体系</span><span>数据可视化大屏</span>
+        </div>
+      </div>
+    </div>
+    <div class="login-right">
+      <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
       <div class="title-box">
         <h3 class="title">{{ title }}</h3>
         <lang-select />
@@ -72,7 +118,8 @@
           <router-link class="link-type" :to="'/register'">{{ proxy.$t('login.switchRegisterPage') }}</router-link>
         </div>
       </el-form-item>
-    </el-form>
+      </el-form>
+    </div>
     <!--  底部  -->
     <div class="el-login-footer">
       <span>Copyright © 2026 图书馆预约系统 · 毕业设计作品 All Rights Reserved.</span>
@@ -237,8 +284,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .login {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  align-items: stretch;
   height: 100%;
   position: relative;
   overflow: hidden;
@@ -258,6 +304,74 @@ onMounted(() => {
   background-image: radial-gradient(rgba(20, 20, 19, 0.05) 1px, transparent 1px);
   background-size: 22px 22px;
   pointer-events: none;
+}
+
+// 左侧品牌插画面板
+.login-hero {
+  flex: 1.15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+  z-index: 1;
+  border-right: 1px solid #e6dfd8;
+  background:
+    radial-gradient(700px 520px at 28% 22%, rgba(204, 120, 92, 0.22), transparent 60%),
+    radial-gradient(600px 480px at 82% 88%, rgba(232, 165, 90, 0.2), transparent 62%),
+    linear-gradient(150deg, #f6eee5 0%, #efe6d9 100%);
+}
+.login-hero-inner {
+  max-width: 460px;
+  text-align: center;
+}
+.login-illus {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  display: block;
+  margin: 0 auto 14px;
+}
+.login-hero-title {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: #252523;
+}
+.login-hero-sub {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #6c6a64;
+  letter-spacing: 1px;
+}
+.login-hero-tags {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.login-hero-tags span {
+  padding: 5px 14px;
+  font-size: 12px;
+  border-radius: 999px;
+  color: #a9583e;
+  background: rgba(204, 120, 92, 0.12);
+  border: 1px solid rgba(204, 120, 92, 0.25);
+}
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .login-hero {
+    display: none;
+  }
 }
 
 .title-box {
@@ -383,6 +497,20 @@ onMounted(() => {
 
   .login::before {
     background-image: radial-gradient(rgba(250, 249, 245, 0.05) 1px, transparent 1px);
+  }
+
+  .login-hero {
+    border-right-color: rgba(230, 223, 216, 0.12);
+    background:
+      radial-gradient(700px 520px at 28% 22%, rgba(204, 120, 92, 0.26), transparent 60%),
+      radial-gradient(600px 480px at 82% 88%, rgba(232, 165, 90, 0.18), transparent 62%),
+      linear-gradient(150deg, #1b1a17 0%, #141312 100%);
+  }
+  .login-hero-title {
+    color: #faf9f5;
+  }
+  .login-hero-sub {
+    color: #a09d96;
   }
 
   .login-form {

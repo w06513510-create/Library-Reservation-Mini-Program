@@ -6,7 +6,8 @@ import { ref } from 'vue';
 import { NavTypeEnum } from '@/enums/NavTypeEnum';
 
 export const useSettingsStore = defineStore('setting', () => {
-  const storageSetting = useStorage<LayoutSetting>('layout-setting', {
+  // 存储键带版本号：换肤(珊瑚暖阅读风)后 bump，让旧缓存(旧蓝主题)失效、读新默认
+  const storageSetting = useStorage<LayoutSetting>('layout-setting-v2', {
     tagsView: defaultSettings.tagsView,
     tagsIcon: defaultSettings.tagsIcon,
     fixedHeader: defaultSettings.fixedHeader,
