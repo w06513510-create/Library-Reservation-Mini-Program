@@ -38,6 +38,12 @@
       </template>
 
       <el-table v-loading="loading" border :data="superviseList" @selection-change="handleSelectionChange">
+        <template #empty>
+          <el-empty :image-size="90" description="暂无数据">
+            <el-button v-hasPermi="['library:supervise:add']" type="primary" icon="Plus" @click="handleAdd">去发起监督</el-button>
+            <el-button icon="Refresh" @click="handleQuery">刷新</el-button>
+          </el-empty>
+        </template>
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="被监督预约ID" align="center" prop="reservationId" width="170" />
         <el-table-column label="座位" align="center" width="130" show-overflow-tooltip>

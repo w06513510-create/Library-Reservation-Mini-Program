@@ -32,6 +32,12 @@
       </template>
 
       <el-table v-loading="loading" border :data="loanList">
+        <template #empty>
+          <el-empty :image-size="90" description="暂无数据">
+            <el-button v-hasPermi="['library:loan:manage']" type="primary" icon="Plus" @click="handleBorrow">去借出办理</el-button>
+            <el-button icon="Refresh" @click="handleQuery">刷新</el-button>
+          </el-empty>
+        </template>
         <el-table-column label="借阅单ID" align="center" prop="id" width="180" />
         <el-table-column label="读者" align="center" width="170" show-overflow-tooltip>
           <template #default="scope">{{ scope.row.readerName || scope.row.readerId }}</template>

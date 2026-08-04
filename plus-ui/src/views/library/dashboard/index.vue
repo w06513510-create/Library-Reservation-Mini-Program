@@ -1,5 +1,14 @@
 <template>
   <div class="lib-screen">
+    <!-- 首屏骨架屏：数据到位前占位，避免白屏 / 零值闪烁（SOP 06 §1 骨架屏优先） -->
+    <div v-if="!loaded" class="screen-skeleton">
+      <div class="sk-kpi-row">
+        <el-skeleton-item v-for="i in 12" :key="'sk' + i" variant="rect" class="sk-kpi" />
+      </div>
+      <div class="sk-chart-grid">
+        <el-skeleton-item v-for="i in 6" :key="'sc' + i" variant="rect" class="sk-chart" />
+      </div>
+    </div>
     <!-- 顶栏 -->
     <div class="screen-header">
       <div class="sh-side">馆藏 {{ d.itemTotal ?? 0 }} 册 · 读者 {{ d.readerTotal ?? 0 }} 人</div>
@@ -53,6 +62,7 @@ import * as echarts from 'echarts';
 import { getDashboardOverview } from '@/api/library/dashboard';
 
 const d = ref<any>({});
+const loaded = ref(false);
 const clock = ref('');
 const gaugeRef = ref<HTMLElement>();
 const seatRef = ref<HTMLElement>();
@@ -162,9 +172,14 @@ const renderCharts = () => {
 };
 
 const load = async () => {
-  const res: any = await getDashboardOverview();
-  d.value = res.data || {};
-  nextTick(renderCharts);
+  try {
+    const res: any = await getDashboardOverview();
+    d.value = res.data || {};
+    await nextTick();
+    renderCharts();
+  } finally {
+    loaded.value = true;
+  }
 };
 
 const tickClock = () => {
@@ -190,10 +205,41 @@ onUnmounted(() => {
 
 <style scoped>
 .lib-screen {
+  position: relative;
   min-height: calc(100vh - 84px);
   padding: 16px;
   background: radial-gradient(1200px 600px at 50% -10%, #12395e 0%, #0a1b2e 55%, #071320 100%);
   color: #cfe8ff;
+}
+/* 首屏骨架屏覆盖层（暗色，与大屏同底） */
+.screen-skeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  padding: 60px 16px 16px;
+  background: radial-gradient(1200px 600px at 50% -10%, #12395e 0%, #0a1b2e 55%, #071320 100%);
+}
+.screen-skeleton .sk-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.screen-skeleton .sk-kpi {
+  height: 92px;
+  border-radius: 12px;
+}
+.screen-skeleton .sk-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.screen-skeleton .sk-chart {
+  height: 260px;
+  border-radius: 12px;
+}
+.screen-skeleton :deep(.el-skeleton__item) {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06) 25%, rgba(255, 255, 255, 0.12) 37%, rgba(255, 255, 255, 0.06) 63%);
 }
 .screen-header {
   display: flex;

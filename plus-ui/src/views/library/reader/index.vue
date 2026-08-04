@@ -45,6 +45,12 @@
       </template>
 
       <el-table v-loading="loading" border :data="readerList" @selection-change="handleSelectionChange">
+        <template #empty>
+          <el-empty :image-size="90" description="暂无数据">
+            <el-button v-hasPermi="['library:reader:add']" type="primary" icon="Plus" @click="handleAdd">去新增</el-button>
+            <el-button icon="Refresh" @click="handleQuery">刷新</el-button>
+          </el-empty>
+        </template>
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="学号/卡号" align="center" prop="studentNo" />
         <el-table-column label="姓名" align="center" prop="realName" />
