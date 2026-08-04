@@ -238,8 +238,28 @@
   background: var(--el-bg-color);
 }
 
+// 柔和表头：加粗 + 浅底（SOP 06 §3；直接给选择器赋值，避开被覆盖的 --el-table-* 变量）
+.el-table th.el-table__cell {
+  background-color: var(--el-fill-color-light) !important;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+}
+
 .el-table__row:hover td.el-table__cell {
   background-color: var(--el-fill-color-light) !important;
+}
+
+// 操作列按钮：整齐等距、自动换行，避免多操作按钮无缝贴一起 / 溢出（SOP 06 §3）
+// 用法：操作列 <el-table-column class-name="fixed-width">
+.el-table .fixed-width .cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  justify-content: center;
+  align-items: center;
+}
+.el-table .fixed-width .cell .el-button {
+  margin-left: 0;
 }
 
 // Tabs
