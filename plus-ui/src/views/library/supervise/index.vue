@@ -40,9 +40,11 @@
       <el-table v-loading="loading" border :data="superviseList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="被监督预约ID" align="center" prop="reservationId" width="170" />
-        <el-table-column label="座位ID" align="center" prop="seatId" width="150" />
-        <el-table-column label="举报读者" align="center" width="120">
-          <template #default="scope">{{ readerName(scope.row.reporterId) }}</template>
+        <el-table-column label="座位" align="center" width="130" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.seatNo || scope.row.seatId }}</template>
+        </el-table-column>
+        <el-table-column label="举报人" align="center" width="170" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.reporterName || scope.row.reporterId }}</template>
         </el-table-column>
         <el-table-column label="举报时间" align="center" prop="reportTime" width="170" />
         <el-table-column label="落座截止" align="center" prop="deadline" width="170" />
@@ -101,7 +103,6 @@ const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 
 const superviseList = ref<SuperviseVO[]>([]);
 const readerOptions = ref<any[]>([]);
-const readerMap = ref<Record<string, string>>({});
 const buttonLoading = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
@@ -116,7 +117,6 @@ const statusOptions = [
 ];
 const statusText = (s: number) => statusOptions.find((o) => o.value === s)?.label || s;
 const statusTag = (s: number) => (['warning', 'success', 'danger'][s] || 'info');
-const readerName = (id: string | number) => readerMap.value[String(id)] || id;
 
 const queryFormRef = ref<ElFormInstance>();
 const superviseFormRef = ref<ElFormInstance>();
@@ -153,15 +153,10 @@ const getList = async () => {
   loading.value = false;
 };
 
-/** 加载读者：id→姓名 映射 + 下拉选项 */
+/** 加载读者下拉选项（发起监督对话框用） */
 const loadReaders = async () => {
   const res = await listReader({ pageNum: 1, pageSize: 999 } as any);
   readerOptions.value = res.rows;
-  const map: Record<string, string> = {};
-  res.rows.forEach((r: any) => {
-    map[String(r.userId)] = r.realName;
-  });
-  readerMap.value = map;
 };
 
 /** 取消按钮 */

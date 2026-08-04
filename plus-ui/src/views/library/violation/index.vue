@@ -41,7 +41,9 @@
 
       <el-table v-loading="loading" border :data="violationList">
         <el-table-column label="违约ID" align="center" prop="id" width="180" />
-        <el-table-column label="读者ID" align="center" prop="readerId" width="160" />
+        <el-table-column label="读者" align="center" width="170" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.readerName || scope.row.readerId }}</template>
+        </el-table-column>
         <el-table-column label="违约类型" align="center" width="130">
           <template #default="scope"><el-tag>{{ typeText(scope.row.violationType) }}</el-tag></template>
         </el-table-column>

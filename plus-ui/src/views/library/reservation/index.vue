@@ -36,8 +36,12 @@
 
       <el-table v-loading="loading" border :data="reservationList">
         <el-table-column label="预约单ID" align="center" prop="id" width="180" />
-        <el-table-column label="读者ID" align="center" prop="readerId" width="170" />
-        <el-table-column label="座位ID" align="center" prop="seatId" width="170" />
+        <el-table-column label="读者" align="center" width="170" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.readerName || scope.row.readerId }}</template>
+        </el-table-column>
+        <el-table-column label="座位" align="center" width="130">
+          <template #default="scope">{{ scope.row.seatNo || scope.row.seatId }}</template>
+        </el-table-column>
         <el-table-column label="日期" align="center" prop="reserveDate" width="110" />
         <el-table-column label="时段" align="center" width="300">
           <template #default="scope">{{ scope.row.startTime }} ~ {{ scope.row.endTime }}</template>

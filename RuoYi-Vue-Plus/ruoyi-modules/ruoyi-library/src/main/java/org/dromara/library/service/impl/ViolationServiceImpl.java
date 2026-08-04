@@ -21,7 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 违约记录Service实现（记违约 → 扣分 → 黑名单判定 一站式）
@@ -46,12 +49,43 @@ public class ViolationServiceImpl implements IViolationService {
     @Override
     public TableDataInfo<ViolationVo> queryPageList(ViolationBo bo, PageQuery pageQuery) {
         Page<ViolationVo> result = baseMapper.selectVoPage(pageQuery.build(), buildQueryWrapper(bo));
+        fillNames(result.getRecords());
         return TableDataInfo.build(result);
     }
 
     @Override
     public List<ViolationVo> queryList(ViolationBo bo) {
-        return baseMapper.selectVoList(buildQueryWrapper(bo));
+        List<ViolationVo> list = baseMapper.selectVoList(buildQueryWrapper(bo));
+        fillNames(list);
+        return list;
+    }
+
+    /** 批量把 读者ID→姓名（学号）填进 VO，供列表以人话展示（SOP 06 §5） */
+    private void fillNames(List<ViolationVo> list) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        List<Long> readerIds = list.stream().map(ViolationVo::getReaderId).filter(Objects::nonNull).distinct().toList();
+        Map<Long, String> readerNames = new HashMap<>();
+        if (!readerIds.isEmpty()) {
+            readerMapper.selectList(Wrappers.<Reader>lambdaQuery().in(Reader::getUserId, readerIds))
+                .forEach(r -> readerNames.put(r.getUserId(), fmtReader(r)));
+        }
+        for (ViolationVo vo : list) {
+            if (vo.getReaderId() != null) {
+                vo.setReaderName(readerNames.get(vo.getReaderId()));
+            }
+        }
+    }
+
+    /** 读者显示名：姓名（学号） */
+    private String fmtReader(Reader r) {
+        String name = r.getRealName() == null ? "" : r.getRealName();
+        String sn = r.getStudentNo() == null ? "" : r.getStudentNo();
+        if (!name.isBlank() && !sn.isBlank()) {
+            return name + "（" + sn + "）";
+        }
+        return !name.isBlank() ? name : sn;
     }
 
     private LambdaQueryWrapper<Violation> buildQueryWrapper(ViolationBo bo) {

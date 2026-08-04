@@ -41,11 +41,19 @@ public class SuperviseVo implements Serializable {
     @ExcelProperty(value = "座位ID")
     private Long seatId;
 
+    /** 座位编号——列表展示用，非表字段 */
+    @ExcelProperty(value = "座位")
+    private String seatNo;
+
     /**
      * 举报读者ID（app_user）
      */
     @ExcelProperty(value = "举报读者ID")
     private Long reporterId;
+
+    /** 举报人姓名（学号）——列表展示用，非表字段 */
+    @ExcelProperty(value = "举报人")
+    private String reporterName;
 
     /**
      * 举报时间

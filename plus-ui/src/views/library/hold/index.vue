@@ -33,8 +33,12 @@
 
       <el-table v-loading="loading" border :data="holdList">
         <el-table-column label="预约ID" align="center" prop="id" width="180" />
-        <el-table-column label="读者ID" align="center" prop="readerId" width="160" />
-        <el-table-column label="书目ID" align="center" prop="bookId" width="160" />
+        <el-table-column label="读者" align="center" width="170" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.readerName || scope.row.readerId }}</template>
+        </el-table-column>
+        <el-table-column label="书名" align="center" min-width="200" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.bookName || scope.row.bookId }}</template>
+        </el-table-column>
         <el-table-column label="队列位次" align="center" prop="queueNo" width="90" />
         <el-table-column label="到书时间" align="center" prop="readyTime" width="160" />
         <el-table-column label="保留期截止" align="center" prop="holdDeadline" width="160" />

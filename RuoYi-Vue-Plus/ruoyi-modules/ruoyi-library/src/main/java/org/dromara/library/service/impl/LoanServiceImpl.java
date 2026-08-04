@@ -16,7 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 借阅流通Service实现（状态跃迁用 CAS，库存冗余 avail_qty 借还即时维护）
@@ -49,12 +52,61 @@ public class LoanServiceImpl implements ILoanService {
     @Override
     public TableDataInfo<LoanVo> queryPageList(LoanBo bo, PageQuery pageQuery) {
         Page<LoanVo> result = baseMapper.selectVoPage(pageQuery.build(), buildQueryWrapper(bo));
+        fillNames(result.getRecords());
         return TableDataInfo.build(result);
     }
 
     @Override
     public List<LoanVo> queryList(LoanBo bo) {
-        return baseMapper.selectVoList(buildQueryWrapper(bo));
+        List<LoanVo> list = baseMapper.selectVoList(buildQueryWrapper(bo));
+        fillNames(list);
+        return list;
+    }
+
+    /** 批量把 读者ID→姓名（学号）、馆藏册ID→条码、书目ID→书名 填进 VO，供列表以人话展示（SOP 06 §5） */
+    private void fillNames(List<LoanVo> list) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        List<Long> readerIds = list.stream().map(LoanVo::getReaderId).filter(Objects::nonNull).distinct().toList();
+        List<Long> itemIds = list.stream().map(LoanVo::getItemId).filter(Objects::nonNull).distinct().toList();
+        List<Long> bookIds = list.stream().map(LoanVo::getBookId).filter(Objects::nonNull).distinct().toList();
+        Map<Long, String> readerNames = new HashMap<>();
+        if (!readerIds.isEmpty()) {
+            readerMapper.selectList(Wrappers.<Reader>lambdaQuery().in(Reader::getUserId, readerIds))
+                .forEach(r -> readerNames.put(r.getUserId(), fmtReader(r)));
+        }
+        Map<Long, String> barcodes = new HashMap<>();
+        if (!itemIds.isEmpty()) {
+            itemMapper.selectList(Wrappers.<BookItem>lambdaQuery().in(BookItem::getId, itemIds))
+                .forEach(i -> barcodes.put(i.getId(), i.getBarcode()));
+        }
+        Map<Long, String> bookNames = new HashMap<>();
+        if (!bookIds.isEmpty()) {
+            bookMapper.selectList(Wrappers.<Book>lambdaQuery().in(Book::getId, bookIds))
+                .forEach(b -> bookNames.put(b.getId(), b.getTitle()));
+        }
+        for (LoanVo vo : list) {
+            if (vo.getReaderId() != null) {
+                vo.setReaderName(readerNames.get(vo.getReaderId()));
+            }
+            if (vo.getItemId() != null) {
+                vo.setBarcode(barcodes.get(vo.getItemId()));
+            }
+            if (vo.getBookId() != null) {
+                vo.setBookName(bookNames.get(vo.getBookId()));
+            }
+        }
+    }
+
+    /** 读者显示名：姓名（学号） */
+    private String fmtReader(Reader r) {
+        String name = r.getRealName() == null ? "" : r.getRealName();
+        String sn = r.getStudentNo() == null ? "" : r.getStudentNo();
+        if (!name.isBlank() && !sn.isBlank()) {
+            return name + "（" + sn + "）";
+        }
+        return !name.isBlank() ? name : sn;
     }
 
     private LambdaQueryWrapper<Loan> buildQueryWrapper(LoanBo bo) {

@@ -8,12 +8,16 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.library.domain.Reader;
 import org.dromara.library.domain.Reservation;
+import org.dromara.library.domain.Seat;
 import org.dromara.library.domain.Supervise;
 import org.dromara.library.domain.bo.SuperviseBo;
 import org.dromara.library.domain.vo.SuperviseVo;
 import org.dromara.library.helper.RuleConfigHelper;
+import org.dromara.library.mapper.ReaderMapper;
 import org.dromara.library.mapper.ReservationMapper;
+import org.dromara.library.mapper.SeatMapper;
 import org.dromara.library.mapper.SuperviseMapper;
 import org.dromara.library.service.ISuperviseService;
 import org.springframework.stereotype.Service;
@@ -21,7 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 占座监督Service业务层处理
@@ -36,6 +43,8 @@ public class SuperviseServiceImpl implements ISuperviseService {
 
     private final SuperviseMapper baseMapper;
     private final ReservationMapper reservationMapper;
+    private final ReaderMapper readerMapper;
+    private final SeatMapper seatMapper;
     private final RuleConfigHelper ruleConfig;
 
     @Override
@@ -47,12 +56,52 @@ public class SuperviseServiceImpl implements ISuperviseService {
     public TableDataInfo<SuperviseVo> queryPageList(SuperviseBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<Supervise> lqw = buildQueryWrapper(bo);
         Page<SuperviseVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        fillNames(result.getRecords());
         return TableDataInfo.build(result);
     }
 
     @Override
     public List<SuperviseVo> queryList(SuperviseBo bo) {
-        return baseMapper.selectVoList(buildQueryWrapper(bo));
+        List<SuperviseVo> list = baseMapper.selectVoList(buildQueryWrapper(bo));
+        fillNames(list);
+        return list;
+    }
+
+    /** 批量把 举报人ID→姓名（学号）、座位ID→座位编号 填进 VO，供列表以人话展示（SOP 06 §5） */
+    private void fillNames(List<SuperviseVo> list) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        List<Long> reporterIds = list.stream().map(SuperviseVo::getReporterId).filter(Objects::nonNull).distinct().toList();
+        List<Long> seatIds = list.stream().map(SuperviseVo::getSeatId).filter(Objects::nonNull).distinct().toList();
+        Map<Long, String> reporterNames = new HashMap<>();
+        if (!reporterIds.isEmpty()) {
+            readerMapper.selectList(Wrappers.<Reader>lambdaQuery().in(Reader::getUserId, reporterIds))
+                .forEach(r -> reporterNames.put(r.getUserId(), fmtReader(r)));
+        }
+        Map<Long, String> seatNos = new HashMap<>();
+        if (!seatIds.isEmpty()) {
+            seatMapper.selectList(Wrappers.<Seat>lambdaQuery().in(Seat::getId, seatIds))
+                .forEach(s -> seatNos.put(s.getId(), s.getSeatNo()));
+        }
+        for (SuperviseVo vo : list) {
+            if (vo.getReporterId() != null) {
+                vo.setReporterName(reporterNames.get(vo.getReporterId()));
+            }
+            if (vo.getSeatId() != null) {
+                vo.setSeatNo(seatNos.get(vo.getSeatId()));
+            }
+        }
+    }
+
+    /** 读者显示名：姓名（学号） */
+    private String fmtReader(Reader r) {
+        String name = r.getRealName() == null ? "" : r.getRealName();
+        String sn = r.getStudentNo() == null ? "" : r.getStudentNo();
+        if (!name.isBlank() && !sn.isBlank()) {
+            return name + "（" + sn + "）";
+        }
+        return !name.isBlank() ? name : sn;
     }
 
     private LambdaQueryWrapper<Supervise> buildQueryWrapper(SuperviseBo bo) {

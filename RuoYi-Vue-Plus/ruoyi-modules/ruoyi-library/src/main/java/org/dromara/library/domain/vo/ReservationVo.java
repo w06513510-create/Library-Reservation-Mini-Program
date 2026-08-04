@@ -29,8 +29,16 @@ public class ReservationVo implements Serializable {
     @ExcelProperty(value = "读者ID")
     private Long readerId;
 
+    /** 读者姓名（学号）——列表展示用，非表字段 */
+    @ExcelProperty(value = "读者")
+    private String readerName;
+
     @ExcelProperty(value = "座位ID")
     private Long seatId;
+
+    /** 座位编号——列表展示用，非表字段 */
+    @ExcelProperty(value = "座位")
+    private String seatNo;
 
     private Long venueId;
     private Long floorId;

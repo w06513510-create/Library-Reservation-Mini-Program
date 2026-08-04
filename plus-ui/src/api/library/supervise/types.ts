@@ -5,8 +5,12 @@ export interface SuperviseVO {
   reservationId: string | number;
   /** 座位ID */
   seatId: string | number;
+  /** 座位编号（列表展示用，非表字段） */
+  seatNo?: string;
   /** 举报读者ID（app_user） */
   reporterId: string | number;
+  /** 举报人姓名（学号）（列表展示用，非表字段） */
+  reporterName?: string;
   /** 举报时间 */
   reportTime: string;
   /** 落座截止时间 */

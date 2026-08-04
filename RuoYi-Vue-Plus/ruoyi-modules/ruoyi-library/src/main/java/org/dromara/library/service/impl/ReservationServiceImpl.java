@@ -22,9 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,12 +58,52 @@ public class ReservationServiceImpl implements IReservationService {
     public TableDataInfo<ReservationVo> queryPageList(ReservationBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<Reservation> lqw = buildQueryWrapper(bo);
         Page<ReservationVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        fillNames(result.getRecords());
         return TableDataInfo.build(result);
     }
 
     @Override
     public List<ReservationVo> queryList(ReservationBo bo) {
-        return baseMapper.selectVoList(buildQueryWrapper(bo));
+        List<ReservationVo> list = baseMapper.selectVoList(buildQueryWrapper(bo));
+        fillNames(list);
+        return list;
+    }
+
+    /** 批量把 读者ID→姓名（学号）、座位ID→座位编号 填进 VO，供列表以人话展示（SOP 06 §5） */
+    private void fillNames(List<ReservationVo> list) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        List<Long> readerIds = list.stream().map(ReservationVo::getReaderId).filter(Objects::nonNull).distinct().toList();
+        List<Long> seatIds = list.stream().map(ReservationVo::getSeatId).filter(Objects::nonNull).distinct().toList();
+        Map<Long, String> readerNames = new HashMap<>();
+        if (!readerIds.isEmpty()) {
+            readerMapper.selectList(Wrappers.<Reader>lambdaQuery().in(Reader::getUserId, readerIds))
+                .forEach(r -> readerNames.put(r.getUserId(), fmtReader(r)));
+        }
+        Map<Long, String> seatNos = new HashMap<>();
+        if (!seatIds.isEmpty()) {
+            seatMapper.selectList(Wrappers.<Seat>lambdaQuery().in(Seat::getId, seatIds))
+                .forEach(s -> seatNos.put(s.getId(), s.getSeatNo()));
+        }
+        for (ReservationVo vo : list) {
+            if (vo.getReaderId() != null) {
+                vo.setReaderName(readerNames.get(vo.getReaderId()));
+            }
+            if (vo.getSeatId() != null) {
+                vo.setSeatNo(seatNos.get(vo.getSeatId()));
+            }
+        }
+    }
+
+    /** 读者显示名：姓名（学号） */
+    private String fmtReader(Reader r) {
+        String name = r.getRealName() == null ? "" : r.getRealName();
+        String sn = r.getStudentNo() == null ? "" : r.getStudentNo();
+        if (!name.isBlank() && !sn.isBlank()) {
+            return name + "（" + sn + "）";
+        }
+        return !name.isBlank() ? name : sn;
     }
 
     private LambdaQueryWrapper<Reservation> buildQueryWrapper(ReservationBo bo) {

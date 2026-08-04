@@ -29,11 +29,23 @@ public class LoanVo implements Serializable {
     @ExcelProperty(value = "读者ID")
     private Long readerId;
 
+    /** 读者姓名（学号）——列表展示用，非表字段 */
+    @ExcelProperty(value = "读者")
+    private String readerName;
+
     @ExcelProperty(value = "馆藏册ID")
     private Long itemId;
 
+    /** 条码——列表展示用，非表字段 */
+    @ExcelProperty(value = "条码")
+    private String barcode;
+
     @ExcelProperty(value = "书目ID")
     private Long bookId;
+
+    /** 书名——列表展示用，非表字段 */
+    @ExcelProperty(value = "书名")
+    private String bookName;
 
     @ExcelProperty(value = "借出时间")
     private Date borrowTime;

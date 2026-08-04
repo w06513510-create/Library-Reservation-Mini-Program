@@ -33,8 +33,15 @@
 
       <el-table v-loading="loading" border :data="loanList">
         <el-table-column label="借阅单ID" align="center" prop="id" width="180" />
-        <el-table-column label="读者ID" align="center" prop="readerId" width="160" />
-        <el-table-column label="馆藏册ID" align="center" prop="itemId" width="160" />
+        <el-table-column label="读者" align="center" width="170" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.readerName || scope.row.readerId }}</template>
+        </el-table-column>
+        <el-table-column label="书名" align="center" min-width="180" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.bookName || scope.row.bookId }}</template>
+        </el-table-column>
+        <el-table-column label="条码" align="center" width="140" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.barcode || scope.row.itemId }}</template>
+        </el-table-column>
         <el-table-column label="借出时间" align="center" prop="borrowTime" width="160" />
         <el-table-column label="应还日" align="center" prop="dueTime" width="160" />
         <el-table-column label="续借" align="center" prop="renewCount" width="60" />
