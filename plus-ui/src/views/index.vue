@@ -47,13 +47,13 @@ const router = useRouter();
 const title = import.meta.env.VITE_APP_TITLE || '图书馆预约系统';
 
 const highlights = [
-  { title: '可视化平面图选座 / 寻书', icon: 'Location', bg: '#e8f3ff', desc: '按坐标还原楼层平面，实时呈现座位空闲 / 占用；图书按索书号排架到书架，读者可视化寻书。' },
+  { title: '可视化平面图选座 / 寻书', icon: 'Location', bg: '#f7ece6', desc: '按坐标还原楼层平面，实时呈现座位空闲 / 占用；图书按索书号排架到书架，读者可视化寻书。' },
   { title: '信用分体系 + 定时任务', icon: 'TrendCharts', bg: '#e8fff3', desc: '爽约 / 逾期 / 超时自动扣分与黑名单联动；SnailJob 定时扫描自动释放、判定违约、恢复信用。' },
   { title: '数据可视化大屏', icon: 'DataLine', bg: '#fff4e8', desc: '座位占用、馆藏流通、违约构成、信用分布多维实时聚合，一屏总览运行态势。' }
 ];
 
 const entries = [
-  { label: '平面图选座', path: '/library/seatmap', icon: 'Location', color: '#3b82f6' },
+  { label: '平面图选座', path: '/library/seatmap', icon: 'Location', color: '#cc785c' },
   { label: '数据大屏', path: '/library/dashboard', icon: 'DataLine', color: '#22c55e' },
   { label: '座位预约', path: '/library/reservation', icon: 'Calendar', color: '#f59e0b' },
   { label: '研讨间预约', path: '/library/roomReservation', icon: 'OfficeBuilding', color: '#8b5cf6' },
@@ -77,9 +77,9 @@ const go = (path: string) => router.push(path).catch(() => {});
   justify-content: space-between;
   padding: 26px 30px;
   border-radius: 14px;
-  background: linear-gradient(120deg, #1d4ed8 0%, #2563eb 40%, #38bdf8 100%);
-  color: #fff;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
+  background: linear-gradient(120deg, #a9583e 0%, #cc785c 48%, #e8a55a 100%);
+  color: #fff7f2;
+  box-shadow: 0 8px 24px rgba(169, 88, 62, 0.28);
 }
 .hero-text h1 {
   margin: 0 0 8px;
@@ -121,25 +121,25 @@ const go = (path: string) => router.push(path).catch(() => {});
   height: 40px;
   border-radius: 10px;
   font-size: 22px;
-  color: #2563eb;
+  color: #cc785c;
 }
 .hl-title {
   font-size: 16px;
   font-weight: 700;
-  color: #1f2d3d;
+  color: #252523;
 }
 .hl-desc {
   font-size: 13px;
   line-height: 1.7;
-  color: #667085;
+  color: #6c6a64;
 }
 .section-title {
   margin: 22px 0 14px;
   font-size: 17px;
   font-weight: 700;
-  color: #1f2d3d;
+  color: #252523;
   padding-left: 10px;
-  border-left: 4px solid #2563eb;
+  border-left: 4px solid #cc785c;
 }
 .entry {
   display: flex;
@@ -150,21 +150,21 @@ const go = (path: string) => router.push(path).catch(() => {});
   margin-bottom: 16px;
   border-radius: 12px;
   background: #fff;
-  border: 1px solid #eef0f4;
+  border: 1px solid #ebe6df;
   cursor: pointer;
   transition: all 0.2s;
 }
 .entry:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-  border-color: #d6e4ff;
+  box-shadow: 0 8px 20px rgba(20, 20, 19, 0.1);
+  border-color: #e2c6b8;
 }
 .entry-icon {
   font-size: 32px;
 }
 .entry-label {
   font-size: 14px;
-  color: #344054;
+  color: #3d3d3a;
   font-weight: 600;
 }
 </style>
