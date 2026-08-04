@@ -43,7 +43,13 @@
         <div class="login-hero-tags">
           <span>可视化选座</span><span>信用分体系</span><span>数据可视化大屏</span>
         </div>
+        <ul class="login-hero-feats">
+          <li>可视化平面图选座 / 寻书，一桌多座成组</li>
+          <li>信用分体系 + SnailJob 定时任务自动处置</li>
+          <li>座位 · 馆藏 · 信用 多维数据可视化大屏</li>
+        </ul>
       </div>
+      <div class="login-hero-foot">图书馆预约系统 · 毕业设计作品 © 2026</div>
     </div>
     <div class="login-right">
       <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
@@ -51,6 +57,7 @@
         <h3 class="title">{{ title }}</h3>
         <lang-select />
       </div>
+      <p class="login-welcome">欢迎登录，请输入账号与密码</p>
       <!-- 去RuoYi化：租户选择器(多租户功能)，单租户项目用不到，已隐藏；需多租户改回 v-if="tenantEnabled" -->
       <el-form-item v-if="false" prop="tenantId">
         <el-select v-model="loginForm.tenantId" filterable :placeholder="proxy.$t('login.selectPlaceholder')" style="width: 100%">
@@ -308,11 +315,11 @@ onMounted(() => {
 
 // 左侧品牌插画面板
 .login-hero {
-  flex: 1.15;
+  flex: 1.25;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: 48px 40px 64px;
   position: relative;
   z-index: 1;
   border-right: 1px solid #e6dfd8;
@@ -359,6 +366,41 @@ onMounted(() => {
   background: rgba(204, 120, 92, 0.12);
   border: 1px solid rgba(204, 120, 92, 0.25);
 }
+.login-hero-feats {
+  list-style: none;
+  margin: 26px auto 0;
+  padding: 0;
+  display: inline-block;
+  text-align: left;
+}
+.login-hero-feats li {
+  position: relative;
+  padding-left: 20px;
+  margin: 12px 0;
+  font-size: 14px;
+  color: #5a574f;
+  line-height: 1.5;
+}
+.login-hero-feats li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cc785c;
+}
+.login-hero-foot {
+  position: absolute;
+  bottom: 28px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #8e8b82;
+}
 .login-right {
   flex: 1;
   display: flex;
@@ -366,6 +408,13 @@ onMounted(() => {
   justify-content: center;
   position: relative;
   z-index: 1;
+}
+.login-welcome {
+  margin: -14px 0 22px;
+  text-align: center;
+  font-size: 13px;
+  color: #8e8b82;
+  letter-spacing: 0.5px;
 }
 
 @media (max-width: 900px) {
@@ -511,6 +560,12 @@ onMounted(() => {
   }
   .login-hero-sub {
     color: #a09d96;
+  }
+  .login-hero-feats li {
+    color: #c9c5bd;
+  }
+  .login-hero-foot {
+    color: #8e8b82;
   }
 
   .login-form {
