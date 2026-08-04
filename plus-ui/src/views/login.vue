@@ -240,9 +240,24 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url('../assets/images/login-background.jpg');
-  background-size: cover;
-  background-position: center;
+  position: relative;
+  overflow: hidden;
+  // 暖阅读风（Claude DESIGN.md）：奶油画布 + 珊瑚/琥珀柔光，取代蓝色科技图
+  background:
+    radial-gradient(920px 520px at 12% 16%, rgba(204, 120, 92, 0.18), transparent 60%),
+    radial-gradient(780px 480px at 88% 84%, rgba(232, 165, 90, 0.16), transparent 62%),
+    radial-gradient(640px 640px at 82% 10%, rgba(93, 184, 166, 0.08), transparent 60%),
+    #faf9f5;
+}
+
+// 极淡暖色点阵纹理，增加编辑式质感
+.login::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(20, 20, 19, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events: none;
 }
 
 .title-box {
@@ -299,23 +314,23 @@ onMounted(() => {
 }
 
 .login-form :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 2px rgba(204, 120, 92, 0.22);
 }
 
 .login-form :deep(.el-button--primary) {
   border-radius: var(--app-radius-md);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 8px 20px rgba(204, 120, 92, 0.28);
 }
 
 .login-form :deep(.el-button.is-circle) {
-  background: rgba(15, 23, 42, 0.04);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(20, 20, 19, 0.04);
+  border: 1px solid rgba(20, 20, 19, 0.08);
   color: var(--el-text-color-regular);
 }
 
 .login-form :deep(.el-button.is-circle:hover) {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.2);
+  background: rgba(204, 120, 92, 0.12);
+  border-color: rgba(204, 120, 92, 0.28);
 }
 
 .login-code {
@@ -346,7 +361,7 @@ onMounted(() => {
   bottom: 0;
   width: 100%;
   text-align: center;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(60, 60, 58, 0.6);
   font-family: Arial, serif;
   font-size: 12px;
   letter-spacing: 1px;
@@ -358,9 +373,21 @@ onMounted(() => {
 }
 
 :global(html.dark) {
+  .login {
+    // 暗色：暖近黑画布 + 珊瑚/琥珀柔光
+    background:
+      radial-gradient(920px 520px at 12% 16%, rgba(204, 120, 92, 0.22), transparent 60%),
+      radial-gradient(780px 480px at 88% 84%, rgba(232, 165, 90, 0.16), transparent 62%),
+      #141312;
+  }
+
+  .login::before {
+    background-image: radial-gradient(rgba(250, 249, 245, 0.05) 1px, transparent 1px);
+  }
+
   .login-form {
-    background: rgba(17, 24, 39, 0.9);
-    border-color: rgba(148, 163, 184, 0.2);
+    background: rgba(31, 30, 27, 0.92);
+    border-color: rgba(230, 223, 216, 0.14);
   }
 
   .login-form :deep(.el-input__wrapper) {
