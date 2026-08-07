@@ -1,24 +1,24 @@
 @echo off
-title Í¼Êé¹ÝÔ¤Ô¼ÏµÍ³ ºó¶ËÆô¶¯Æ÷ (RuoYi-Vue-Plus / fat jar)
+title Í¼ï¿½ï¿½ï¿½Ô¤Ô¼ÏµÍ³ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (RuoYi-Vue-Plus / fat jar)
 
 REM ============================================================
-REM  Í¼Êé¹ÝÔ¤Ô¼ÏµÍ³ ºó¶ËÒ»¼üÆô¶¯ (±¾½Å±¾ÔÚ scripts\ ÏÂ, Æô¶¯Ê±×Ô¶¯ÇÐµ½ ..\RuoYi-Vue-Plus)
+REM  Í¼ï¿½ï¿½ï¿½Ô¤Ô¼ÏµÍ³ ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½Å±ï¿½ï¿½ï¿½ scripts\ ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ô¶ï¿½ï¿½Ðµï¿½ ..\RuoYi-Vue-Plus)
 REM
-REM  Ô­Àí: ÓÃ Maven reactor ´ò×Ô°üº¬ fat jar (º¬È«²¿ÒÀÀµ) ÔÙ java -jar,
-REM        Æô¶¯½×¶ÎÁã Maven¡¢ÁãÏÂÔØ¡£ÐÖµÜÄ£¿éÖ®¼äÊÇ jar ÒÀÀµ, ÃüÁîÐÐ±ØÐëÏÈÓÃ
-REM        reactor(-pl ruoyi-admin -am) °ÑÐÖµÜÄ£¿éÒ»Æð±àÒë, fat jar Àï²Å´øÆëËùÓÐÀà¡£
+REM  Ô­ï¿½ï¿½: ï¿½ï¿½ Maven reactor ï¿½ï¿½ï¿½Ô°ï¿½ï¿½ï¿½ fat jar (ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½) ï¿½ï¿½ java -jar,
+REM        ï¿½ï¿½ï¿½ï¿½ï¿½×¶ï¿½ï¿½ï¿½ Mavenï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¡ï¿½ï¿½Öµï¿½Ä£ï¿½ï¿½Ö®ï¿½ï¿½ï¿½ï¿½ jar ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+REM        reactor(-pl ruoyi-admin -am) ï¿½ï¿½ï¿½Öµï¿½Ä£ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½, fat jar ï¿½ï¿½Å´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à¡£
 REM
-REM  ÓÃ·¨ (Ë«»÷, »òÔÚ scripts Ä¿Â¼Ö´ÐÐ):
-REM    run-backend.bat            ÓÐ jar Ö±½ÓÆô¶¯; Ã»ÓÐÔòÏÈ¹¹½¨ÔÙÆô¶¯
-REM    run-backend.bat build      Ç¿ÖÆÖØÐÂ¹¹½¨ fat jar ºóÔÙÆô¶¯ (¸ÄÁËºó¶Ë´úÂëºóÓÃÕâ¸ö!)
-REM    run-backend.bat run prod   µÚ¶þ²ÎÊý¿ÉÑ¡, ¸²¸Ç spring profile (prod/local, Ä¬ÈÏ dev)
+REM  ï¿½Ã·ï¿½ (Ë«ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ scripts Ä¿Â¼Ö´ï¿½ï¿½):
+REM    run-backend.bat            ï¿½ï¿½ jar Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½; Ã»ï¿½ï¿½ï¿½ï¿½ï¿½È¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+REM    run-backend.bat build      Ç¿ï¿½ï¿½ï¿½ï¿½ï¿½Â¹ï¿½ï¿½ï¿½ fat jar ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½Ëºï¿½Ë´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!)
+REM    run-backend.bat run prod   ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡, ï¿½ï¿½ï¿½ï¿½ spring profile (prod/local, Ä¬ï¿½ï¿½ dev)
 REM
-REM  [!] Ç°ÖÃ: ±¾»ú MySQL(¿â library_reservation) + Docker µÄ library-redis / library-minio ÒÑ¾ÍÐ÷
-REM  [!] ÉÏ´«±¨"ÏµÍ³½Ó¿ÚÇëÇó³¬Ê±" ¶àÎª MinIO Ã»Æð»ò sys_oss_config Î´¶ÔÆë; ¸ÄÁËºó¶Ë´úÂëÓÃ build ÖØ¹¹½¨
-REM  [!] ¶Ë¿Ú 8199 (application.yml server.port)
+REM  [!] Ç°ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ MySQL(ï¿½ï¿½ library_reservation) + Docker ï¿½ï¿½ library-redis / library-minio ï¿½Ñ¾ï¿½ï¿½ï¿½
+REM  [!] ï¿½Ï´ï¿½ï¿½ï¿½"ÏµÍ³ï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½Ê±" ï¿½ï¿½Îª MinIO Ã»ï¿½ï¿½ï¿½ sys_oss_config Î´ï¿½ï¿½ï¿½ï¿½; ï¿½ï¿½ï¿½Ëºï¿½Ë´ï¿½ï¿½ï¿½ï¿½ï¿½ build ï¿½Ø¹ï¿½ï¿½ï¿½
+REM  [!] ï¿½Ë¿ï¿½ 8199 (application.yml server.port)
 REM ============================================================
 
-REM ---- ¹Ì¶¨»·¾³ (±¾»úÕæÊµÂ·¾¶) ----
+REM ---- ï¿½Ì¶ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÊµÂ·ï¿½ï¿½) ----
 set "JAVA_HOME=D:\jdk\jdk17"
 set "MAVEN_HOME=D:\Maven\maven\apache-maven-3.9.12"
 set "MAVEN_REPO=D:\Maven\.m2\repository"
@@ -27,13 +27,13 @@ set "JAVA=%JAVA_HOME%\bin\java.exe"
 set "JAR=ruoyi-admin\target\ruoyi-admin.jar"
 set "PATH=%JAVA_HOME%\bin;%MAVEN_HOME%\bin;%PATH%"
 
-REM ---- ÇÐµ½ RuoYi-Vue-Plus ÏîÄ¿¸ù (±¾½Å±¾ÔÚ scripts\ ÏÂ, ÉÏÒ»¼¶ÊÇÏîÄ¿¸ù) ----
+REM ---- ï¿½Ðµï¿½ RuoYi-Vue-Plus ï¿½ï¿½Ä¿ï¿½ï¿½ (ï¿½ï¿½ï¿½Å±ï¿½ï¿½ï¿½ scripts\ ï¿½ï¿½, ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½) ----
 cd /d "%~dp0..\RuoYi-Vue-Plus"
 
-REM ---- »ù±¾Ð£Ñé ----
-if not exist "%JAVA%" ( echo [´íÎó] Î´ÕÒµ½ JDK: "%JAVA%" & goto :end )
-if not exist "%MVN%"  ( echo [´íÎó] Î´ÕÒµ½ Maven: "%MVN%" & goto :end )
-if not exist "ruoyi-admin\pom.xml" ( echo [´íÎó] Î´¶¨Î»µ½ RuoYi-Vue-Plus ÏîÄ¿¸ù [µ±Ç°: %cd%], ÇëÈ·ÈÏ±¾½Å±¾ÔÚ scripts\ ÏÂ & goto :end )
+REM ---- ï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ ----
+if not exist "%JAVA%" ( echo [ï¿½ï¿½ï¿½ï¿½] Î´ï¿½Òµï¿½ JDK: "%JAVA%" & goto :end )
+if not exist "%MVN%"  ( echo [ï¿½ï¿½ï¿½ï¿½] Î´ï¿½Òµï¿½ Maven: "%MVN%" & goto :end )
+if not exist "ruoyi-admin\pom.xml" ( echo [ï¿½ï¿½ï¿½ï¿½] Î´ï¿½ï¿½Î»ï¿½ï¿½ RuoYi-Vue-Plus ï¿½ï¿½Ä¿ï¿½ï¿½ [ï¿½ï¿½Ç°: %cd%], ï¿½ï¿½È·ï¿½Ï±ï¿½ï¿½Å±ï¿½ï¿½ï¿½ scripts\ ï¿½ï¿½ & goto :end )
 
 set "MODE=%~1"
 if "%MODE%"=="" set "MODE=run"
@@ -43,44 +43,44 @@ set "PROFARG="
 if not "%PROFILE%"=="" set "PROFARG=--spring.profiles.active=%PROFILE%"
 
 echo ============================================================
-echo  ÏîÄ¿¸ù    = %cd%
+echo  ï¿½ï¿½Ä¿ï¿½ï¿½    = %cd%
 echo  JAVA_HOME = %JAVA_HOME%
 echo  MAVEN     = %MAVEN_HOME%
 echo  REPO      = %MAVEN_REPO%
-echo  Ä£Ê½ MODE = %MODE%    ¶Ë¿Ú(Ä¬ÈÏ) = 8199
-echo  ÌáÊ¾: Æô¶¯Ç°ÇëÈ·±£ MySQL / Redis / MinIO ÒÑ¾ÍÐ÷
+echo  Ä£Ê½ MODE = %MODE%    ï¿½Ë¿ï¿½(Ä¬ï¿½ï¿½) = 8199
+echo  ï¿½ï¿½Ê¾: ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½È·ï¿½ï¿½ MySQL / Redis / MinIO ï¿½Ñ¾ï¿½ï¿½ï¿½
 echo ============================================================
 echo.
 
 if /i "%MODE%"=="build"   goto :build
 if /i "%MODE%"=="rebuild" goto :build
 
-REM ---- Ä¬ÈÏ: ÓÐ jar Ö±½ÓÅÜ, Ã»ÓÐÔòÏÈ¹¹½¨ ----
+REM ---- Ä¬ï¿½ï¿½: ï¿½ï¿½ jar Ö±ï¿½ï¿½ï¿½ï¿½, Ã»ï¿½ï¿½ï¿½ï¿½ï¿½È¹ï¿½ï¿½ï¿½ ----
 if exist "%JAR%" goto :runjar
-echo Î´·¢ÏÖ fat jar, ÏÈ¹¹½¨Ò»´Î ...
+echo Î´ï¿½ï¿½ï¿½ï¿½ fat jar, ï¿½È¹ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ ...
 goto :build
 
 :build
-echo [¹¹½¨] mvn -pl ruoyi-admin -am -Dmaven.test.skip=true package  (Ê×´Î¼¸·ÖÖÓ, Ö®ºóÓÐ»º´æ½Ï¿ì) ...
+echo [ï¿½ï¿½ï¿½ï¿½] mvn -pl ruoyi-admin -am -Dmaven.test.skip=true package  (ï¿½×´Î¼ï¿½ï¿½ï¿½ï¿½ï¿½, Ö®ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½Ï¿ï¿½) ...
 call "%MVN%" -Dmaven.repo.local="%MAVEN_REPO%" -pl ruoyi-admin -am -Dmaven.test.skip=true package
 if errorlevel 1 goto :builderr
-if not exist "%JAR%" ( echo [´íÎó] ¹¹½¨Íê³Éµ«Î´ÕÒµ½ %JAR% & goto :end )
-echo [¹¹½¨Íê³É]
+if not exist "%JAR%" ( echo [ï¿½ï¿½ï¿½ï¿½] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Éµï¿½Î´ï¿½Òµï¿½ %JAR% & goto :end )
+echo [ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]
 echo.
 
 :runjar
-echo [Æô¶¯] java -jar %JAR%
+echo [ï¿½ï¿½ï¿½ï¿½] java -jar %JAR%
 echo ------------------------------------------------------------
 chcp 65001 >nul
-"%JAVA%" -Dfile.encoding=UTF-8 -jar "%JAR%" %PROFARG%
+"%JAVA%" -Dfile.encoding=UTF-8 -Duser.timezone=Asia/Shanghai -jar "%JAR%" %PROFARG%
 goto :end
 
 :builderr
 echo.
-echo [Ê§°Ü] Maven ¹¹½¨Ê§°Ü, Çë²é¿´ÉÏ·½ÈÕÖ¾ÅÅ²é.
+echo [Ê§ï¿½ï¿½] Maven ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½, ï¿½ï¿½é¿´ï¿½Ï·ï¿½ï¿½ï¿½Ö¾ï¿½Å²ï¿½.
 goto :end
 
 :end
 echo.
-echo (½ø³ÌÒÑÍË³ö) °´ÈÎÒâ¼ü¹Ø±Õ´°¿Ú ...
+echo (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø±Õ´ï¿½ï¿½ï¿½ ...
 pause >nul

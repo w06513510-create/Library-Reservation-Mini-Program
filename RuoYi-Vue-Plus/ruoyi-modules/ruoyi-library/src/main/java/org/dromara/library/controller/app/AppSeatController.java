@@ -17,6 +17,7 @@ import org.dromara.library.service.IFloorService;
 import org.dromara.library.service.IReservationService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,6 +59,14 @@ public class AppSeatController {
         if (bo.getSeatId() == null || bo.getReserveDate() == null
             || bo.getStartTime() == null || bo.getEndTime() == null) {
             throw new ServiceException("座位、预约日期、时段起止不能为空");
+        }
+        if (!bo.getEndTime().after(bo.getStartTime())) {
+            throw new ServiceException("结束时间须晚于开始时间");
+        }
+        // 只能预约"尚未开始"的时段：开始时间须晚于当前时间（中国时间，见 JVM user.timezone=Asia/Shanghai）。
+        // 杜绝约过去/已开始的时段——那样会被自动作业即刻判爽约，且不符合真实馆规（起始须晚于当前）。
+        if (!bo.getStartTime().after(new Date())) {
+            throw new ServiceException("只能预约尚未开始的时段，开始时间须晚于当前时间");
         }
         bo.setId(null);
         bo.setReaderId(AppLoginHelper.getUserId());

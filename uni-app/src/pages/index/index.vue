@@ -62,12 +62,13 @@ import { ref } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { readerApi, type ReaderVo } from '../../api/library';
 import { getToken } from '../../utils/request';
+import { chinaHour } from '../../utils/datetime';
 
 const profile = ref<ReaderVo | null>(null);
 const greet = ref('你好');
 
 function calcGreet() {
-  const h = new Date().getHours();
+  const h = chinaHour();
   greet.value = h < 6 ? '夜深了' : h < 11 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
 }
 

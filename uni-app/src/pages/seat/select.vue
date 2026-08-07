@@ -12,18 +12,22 @@
 
     <!-- 日期 + 时段 -->
     <view class="bar">
-      <picker mode="date" :value="date" :start="today" @change="onDate">
+      <picker mode="date" :value="date" :start="today" :end="maxDate" @change="onDate">
         <view class="picker">📅 {{ date }} <text class="caret">▾</text></view>
       </picker>
       <view class="slots">
         <view
           v-for="(s, i) in slots"
           :key="i"
-          :class="['slot', i === slotIdx ? 'slot--on' : '']"
+          :class="['slot', i === slotIdx ? 'slot--on' : '', slotDisabled(i) ? 'slot--off' : '']"
           @click="pickSlot(i)"
         >{{ s.label }}</view>
       </view>
     </view>
+
+    <!-- 开放时段提示（中国时间；仅可约今日及未来、尚未开始的时段） -->
+    <view v-if="noBookableToday" class="note note--warn">今日已无可约时段，请选择明天或之后的日期</view>
+    <view v-else class="note">开放时段 08:00–22:00 · 仅可预约今日及未来、尚未开始的时段（北京时间）</view>
 
     <!-- 图例 -->
     <view class="legend">
@@ -68,6 +72,7 @@ import { ref, computed } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { seatApi, type FloorVo, type SeatStatusVo } from '../../api/library';
 import { getToken } from '../../utils/request';
+import { chinaToday, chinaDatePlus, chinaMinutesOfDay, hmToMinutes } from '../../utils/datetime';
 
 const slots = [
   { label: '上午', start: '08:00:00', end: '12:00:00' },
@@ -75,12 +80,9 @@ const slots = [
   { label: '晚间', start: '18:30:00', end: '22:00:00' }
 ];
 
-function fmtDate(d: Date) {
-  const p = (n: number) => (n < 10 ? '0' + n : '' + n);
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-}
-
-const today = fmtDate(new Date());
+// 全部按中国时间(Asia/Shanghai)：可约今天~未来 7 天；今天只放"尚未开始"的时段（起始须晚于当前）
+const today = chinaToday();
+const maxDate = chinaDatePlus(6);
 const floors = ref<FloorVo[]>([]);
 const floorId = ref<number | null>(null);
 const date = ref(today);
@@ -107,6 +109,20 @@ const groups = computed(() => {
   return Array.from(map.values());
 });
 
+/** 某时段在所选日期是否不可约：今天只允许"尚未开始"的时段；过去日期全禁（picker 已限下界） */
+function slotDisabled(i: number): boolean {
+  if (date.value > today) return false;
+  if (date.value < today) return true;
+  return chinaMinutesOfDay() >= hmToMinutes(slots[i].start);
+}
+/** 第一个可约时段下标，无则 -1 */
+function firstEnabledSlot(): number {
+  for (let i = 0; i < slots.length; i++) if (!slotDisabled(i)) return i;
+  return -1;
+}
+/** 今日是否已无可约时段（晚间也已开始） */
+const noBookableToday = computed(() => date.value === today && firstEnabledSlot() < 0);
+
 function seatCls(s: SeatStatusVo) {
   if (picked.value && picked.value.id === s.id) return 'seat--sel';
   if (s.occupied || s.seatStatus !== 0) return 'seat--busy';
@@ -124,6 +140,12 @@ async function loadFloors() {
 
 async function loadSeats() {
   if (floorId.value == null) return;
+  // 今天：确保选中的是"尚未开始"的时段；已选时段过期则切到首个可约时段
+  if (date.value === today && slotDisabled(slotIdx.value)) {
+    const f = firstEnabledSlot();
+    if (f < 0) { seats.value = []; picked.value = null; loading.value = false; return; } // 今日已无可约时段
+    slotIdx.value = f;
+  }
   loading.value = true;
   picked.value = null;
   try {
@@ -138,8 +160,19 @@ async function loadSeats() {
 }
 
 function pickFloor(id: number) { floorId.value = id; loadSeats(); }
-function pickSlot(i: number) { slotIdx.value = i; loadSeats(); }
-function onDate(e: any) { date.value = e.detail.value; loadSeats(); }
+function pickSlot(i: number) {
+  if (slotDisabled(i)) { uni.showToast({ title: '该时段已开始或已过，不可预约', icon: 'none' }); return; }
+  slotIdx.value = i;
+  loadSeats();
+}
+function onDate(e: any) {
+  date.value = e.detail.value;
+  if (slotDisabled(slotIdx.value)) {
+    const f = firstEnabledSlot();
+    if (f >= 0) slotIdx.value = f;
+  }
+  loadSeats();
+}
 
 function tapSeat(s: SeatStatusVo) {
   if (s.occupied || s.seatStatus !== 0) {
@@ -228,6 +261,13 @@ onShow(() => {
   background: #fff;
   color: #6b6259;
   &--on { background: #fdeee7; color: #d9714e; font-weight: 700; }
+  &--off { opacity: 0.38; text-decoration: line-through; }
+}
+.note {
+  padding: 4rpx 28rpx 12rpx;
+  font-size: 22rpx;
+  color: #b3aaa1;
+  &--warn { color: #cf5b4e; }
 }
 .legend {
   display: flex;
