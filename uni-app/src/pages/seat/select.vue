@@ -80,9 +80,9 @@ const slots = [
   { label: '晚间', start: '18:30:00', end: '22:00:00' }
 ];
 
-// 全部按中国时间(Asia/Shanghai)：可约今天~未来 7 天；今天只放"尚未开始"的时段（起始须晚于当前）
+// 全部按中国时间(Asia/Shanghai)：可约今天起 3 天(今/明/后)；今天只放"尚未开始"的时段（起始须晚于当前）
 const today = chinaToday();
-const maxDate = chinaDatePlus(6);
+const maxDate = chinaDatePlus(2);
 const floors = ref<FloorVo[]>([]);
 const floorId = ref<number | null>(null);
 const date = ref(today);
