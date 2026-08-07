@@ -44,6 +44,14 @@
         <view class="cell-ic" style="background:#faece9">⚠️</view>
         <text class="cell-t">违约申诉</text>
       </view>
+      <view class="cell" @click="goRoom">
+        <view class="cell-ic" style="background:#eef0fa">👥</view>
+        <text class="cell-t">研讨间</text>
+      </view>
+      <view class="cell" @click="goSuggest">
+        <view class="cell-ic" style="background:#eaf3ec">💡</view>
+        <text class="cell-t">图书荐购</text>
+      </view>
       <view class="cell" @click="goRules">
         <view class="cell-ic" style="background:#eef0fa">📖</view>
         <text class="cell-t">规则说明</text>
@@ -97,6 +105,8 @@ function goReservations() { uni.navigateTo({ url: '/pages/seat/reservations' });
 function goCredit() { uni.navigateTo({ url: '/pages/reader/credit' }); }
 function goViolations() { uni.navigateTo({ url: '/pages/reader/violations' }); }
 function goRules() { uni.navigateTo({ url: '/pages/reader/rules' }); }
+function goRoom() { uni.navigateTo({ url: '/pages/room/select' }); }
+function goSuggest() { uni.navigateTo({ url: '/pages/reader/suggest' }); }
 </script>
 
 <style lang="scss">

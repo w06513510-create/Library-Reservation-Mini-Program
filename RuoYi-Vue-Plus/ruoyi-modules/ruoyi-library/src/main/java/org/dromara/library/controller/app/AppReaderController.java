@@ -11,16 +11,19 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.library.domain.CreditLog;
 import org.dromara.library.domain.Reader;
 import org.dromara.library.domain.bo.AppealBo;
+import org.dromara.library.domain.bo.PurchaseSuggestBo;
 import org.dromara.library.domain.bo.RuleConfigBo;
 import org.dromara.library.domain.bo.ViolationBo;
 import org.dromara.library.domain.vo.AppealVo;
 import org.dromara.library.domain.vo.CreditLogVo;
+import org.dromara.library.domain.vo.PurchaseSuggestVo;
 import org.dromara.library.domain.vo.ReaderVo;
 import org.dromara.library.domain.vo.RuleConfigVo;
 import org.dromara.library.domain.vo.ViolationVo;
 import org.dromara.library.mapper.CreditLogMapper;
 import org.dromara.library.mapper.ReaderMapper;
 import org.dromara.library.service.IAppealService;
+import org.dromara.library.service.IPurchaseSuggestService;
 import org.dromara.library.service.IRuleConfigService;
 import org.dromara.library.service.IViolationService;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +49,7 @@ public class AppReaderController {
     private final IViolationService violationService;
     private final IAppealService appealService;
     private final IRuleConfigService ruleConfigService;
+    private final IPurchaseSuggestService purchaseSuggestService;
 
     /** 我的读者档案（含信用分 / 黑名单 / 守信次数） */
     @GetMapping("/profile")
@@ -102,6 +106,26 @@ public class AppReaderController {
     @GetMapping("/rules")
     public R<List<RuleConfigVo>> rules() {
         return R.ok(ruleConfigService.queryList(new RuleConfigBo()));
+    }
+
+    /** 我的荐购记录（状态：0待受理 1已受理转采购 2已驳回 3已采购） */
+    @GetMapping("/suggests")
+    public TableDataInfo<PurchaseSuggestVo> suggests(PageQuery pageQuery) {
+        PurchaseSuggestBo bo = new PurchaseSuggestBo();
+        bo.setReaderId(AppLoginHelper.getUserId());
+        return purchaseSuggestService.queryPageList(bo, pageQuery);
+    }
+
+    /** 发起图书荐购（readerId 强制当前读者；书名必填） */
+    @PostMapping("/suggest")
+    public R<Void> suggest(@RequestBody PurchaseSuggestBo bo) {
+        if (bo.getTitle() == null || bo.getTitle().trim().isEmpty()) {
+            throw new ServiceException("书名不能为空");
+        }
+        bo.setId(null);
+        bo.setReaderId(AppLoginHelper.getUserId());
+        bo.setStatus(0);
+        return purchaseSuggestService.insertByBo(bo) ? R.ok() : R.fail();
     }
 
 }

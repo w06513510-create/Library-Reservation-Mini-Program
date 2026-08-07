@@ -22,10 +22,12 @@
     </view>
 
     <view class="menu">
-      <view class="mi" @click="go('/pages/seat/reservations')"><text>📋 我的预约</text><text class="ar">›</text></view>
+      <view class="mi" @click="go('/pages/seat/reservations')"><text>📋 我的座位预约</text><text class="ar">›</text></view>
+      <view class="mi" @click="go('/pages/room/reservations')"><text>👥 我的研讨间</text><text class="ar">›</text></view>
       <view class="mi" @click="go('/pages/book/search')"><text>📚 我的借阅</text><text class="ar">›</text></view>
       <view class="mi" @click="go('/pages/reader/credit')"><text>⭐ 信用分与流水</text><text class="ar">›</text></view>
       <view class="mi" @click="go('/pages/reader/violations')"><text>⚠️ 违约与申诉</text><text class="ar">›</text></view>
+      <view class="mi" @click="go('/pages/reader/suggest')"><text>💡 图书荐购</text><text class="ar">›</text></view>
       <view class="mi" @click="go('/pages/reader/rules')"><text>📖 规则说明</text><text class="ar">›</text></view>
     </view>
 

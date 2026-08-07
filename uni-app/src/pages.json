@@ -45,6 +45,24 @@
       "style": { "navigationBarTitleText": "规则说明" }
     },
     {
+      "path": "pages/room/select",
+      "style": { "navigationBarTitleText": "研讨间预约" }
+    },
+    {
+      "path": "pages/room/reservations",
+      "style": {
+        "navigationBarTitleText": "我的研讨间",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/reader/suggest",
+      "style": {
+        "navigationBarTitleText": "图书荐购",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
       "path": "pages/login/login",
       "style": { "navigationBarTitleText": "登录" }
     }

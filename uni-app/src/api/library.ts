@@ -116,6 +116,41 @@ export interface HoldVo {
   status: number;
 }
 
+export interface RoomVo {
+  id: number;
+  floorId: number;
+  roomName: string;
+  capacity: number;
+  minUsers: number;
+  needApprove: number;
+  needCheckin: number;
+  status?: number;
+}
+
+export interface RoomReservationVo {
+  id: number;
+  readerId: number;
+  roomId: number;
+  reserveDate?: string;
+  startTime?: string;
+  endTime?: string;
+  userCount?: number;
+  status: number; // 0待审批 1待使用 2使用中 3已完成 4已取消 5已驳回 6已违约
+  rejectReason?: string;
+}
+
+export interface PurchaseSuggestVo {
+  id: number;
+  readerId: number;
+  title: string;
+  author?: string;
+  isbn?: string;
+  reason?: string;
+  status: number; // 0待受理 1已受理 2已驳回 3已采购
+  rejectReason?: string;
+  createTime?: string;
+}
+
 // ---------- 选座预约 ----------
 export const seatApi = {
   floors: () => request<FloorVo[]>({ url: '/app/library/seat/floors' }),
@@ -141,7 +176,22 @@ export const readerApi = {
   appeals: (params: Record<string, any>) => request<any[]>({ url: '/app/library/reader/appeals', params }),
   appeal: (violationId: number, reason: string) =>
     request<void>({ url: '/app/library/reader/appeal', method: 'POST', data: { violationId, reason } }),
-  rules: () => request<RuleConfigVo[]>({ url: '/app/library/reader/rules' })
+  rules: () => request<RuleConfigVo[]>({ url: '/app/library/reader/rules' }),
+  suggests: (params: Record<string, any>) =>
+    request<PurchaseSuggestVo[]>({ url: '/app/library/reader/suggests', params }),
+  suggest: (data: { title: string; author?: string; isbn?: string; reason?: string }) =>
+    request<void>({ url: '/app/library/reader/suggest', method: 'POST', data })
+};
+
+// ---------- 研讨间预约 ----------
+export const roomApi = {
+  list: (floorId?: number) => request<RoomVo[]>({ url: '/app/library/room/list', params: { floorId } }),
+  reserve: (data: { roomId: number; reserveDate: string; startTime: string; endTime: string; userCount: number }) =>
+    request<void>({ url: '/app/library/room/reserve', method: 'POST', data }),
+  myReservations: (params: Record<string, any>) =>
+    request<RoomReservationVo[]>({ url: '/app/library/room/reservations', params }),
+  checkIn: (id: number) => request<void>({ url: `/app/library/room/checkIn/${id}`, method: 'PUT' }),
+  cancel: (id: number) => request<void>({ url: `/app/library/room/cancel/${id}`, method: 'PUT' })
 };
 
 // ---------- 图书 ----------
