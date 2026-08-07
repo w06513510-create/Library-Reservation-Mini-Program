@@ -421,6 +421,10 @@ onMounted(() => {
   .login-hero {
     display: none;
   }
+  .el-login-footer {
+    display: block;
+    color: rgba(60, 60, 58, 0.6);
+  }
 }
 
 .title-box {
@@ -518,6 +522,9 @@ onMounted(() => {
 }
 
 .el-login-footer {
+  // 桌面端隐藏旧全宽页脚（左侧品牌面板底部的 .login-hero-foot 已承载版权/品牌），
+  // 避免与浮标、品牌行重叠被截成 "…nts Reserved." 碎片；窄屏(隐藏了插画面板)时再显示
+  display: none;
   height: 40px;
   line-height: 40px;
   position: fixed;
