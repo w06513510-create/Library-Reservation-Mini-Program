@@ -63,6 +63,13 @@
       }
     },
     {
+      "path": "pages/message/notice",
+      "style": {
+        "navigationBarTitleText": "消息通知",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
       "path": "pages/login/login",
       "style": { "navigationBarTitleText": "登录" }
     }

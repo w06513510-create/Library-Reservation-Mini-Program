@@ -28,6 +28,7 @@
       <view class="mi" @click="go('/pages/reader/credit')"><text>⭐ 信用分与流水</text><text class="ar">›</text></view>
       <view class="mi" @click="go('/pages/reader/violations')"><text>⚠️ 违约与申诉</text><text class="ar">›</text></view>
       <view class="mi" @click="go('/pages/reader/suggest')"><text>💡 图书荐购</text><text class="ar">›</text></view>
+      <view class="mi" @click="go('/pages/message/notice')"><text>🔔 消息通知</text><text class="ar">›</text></view>
       <view class="mi" @click="go('/pages/reader/rules')"><text>📖 规则说明</text><text class="ar">›</text></view>
     </view>
 

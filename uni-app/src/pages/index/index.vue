@@ -56,6 +56,10 @@
         <view class="cell-ic" style="background:#eef0fa">📖</view>
         <text class="cell-t">规则说明</text>
       </view>
+      <view class="cell" @click="goNotice">
+        <view class="cell-ic" style="background:#faece9">🔔<text v-if="unread > 0" class="badge">{{ unread > 99 ? '99+' : unread }}</text></view>
+        <text class="cell-t">消息</text>
+      </view>
     </view>
 
     <view class="tips">
@@ -69,10 +73,12 @@
 import { ref } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { readerApi, type ReaderVo } from '../../api/library';
+import { apiNoticeUnread } from '../../api/message';
 import { getToken } from '../../utils/request';
 import { chinaHour } from '../../utils/datetime';
 
 const profile = ref<ReaderVo | null>(null);
+const unread = ref(0);
 const greet = ref('你好');
 
 function calcGreet() {
@@ -83,6 +89,7 @@ function calcGreet() {
 async function loadProfile() {
   if (!getToken()) {
     profile.value = null;
+    unread.value = 0;
     return;
   }
   try {
@@ -90,6 +97,11 @@ async function loadProfile() {
     profile.value = res.data || null;
   } catch (e) {
     profile.value = null;
+  }
+  try {
+    unread.value = (await apiNoticeUnread()).data || 0;
+  } catch (e) {
+    unread.value = 0;
   }
 }
 
@@ -107,6 +119,7 @@ function goViolations() { uni.navigateTo({ url: '/pages/reader/violations' }); }
 function goRules() { uni.navigateTo({ url: '/pages/reader/rules' }); }
 function goRoom() { uni.navigateTo({ url: '/pages/room/select' }); }
 function goSuggest() { uni.navigateTo({ url: '/pages/reader/suggest' }); }
+function goNotice() { uni.navigateTo({ url: '/pages/message/notice' }); }
 </script>
 
 <style lang="scss">
@@ -167,6 +180,7 @@ function goSuggest() { uni.navigateTo({ url: '/pages/reader/suggest' }); }
   align-items: center;
   padding: 24rpx 0;
   .cell-ic {
+    position: relative;
     width: 88rpx;
     height: 88rpx;
     border-radius: 24rpx;
@@ -174,6 +188,21 @@ function goSuggest() { uni.navigateTo({ url: '/pages/reader/suggest' }); }
     align-items: center;
     justify-content: center;
     font-size: 44rpx;
+    .badge {
+      position: absolute;
+      top: -8rpx;
+      right: -8rpx;
+      min-width: 30rpx;
+      height: 30rpx;
+      padding: 0 8rpx;
+      box-sizing: border-box;
+      background: #cf5b4e;
+      color: #fff;
+      font-size: 20rpx;
+      line-height: 30rpx;
+      text-align: center;
+      border-radius: 100rpx;
+    }
   }
   .cell-t { margin-top: 14rpx; font-size: 26rpx; color: #3a332e; }
 }

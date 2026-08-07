@@ -16,6 +16,7 @@ import org.dromara.library.mapper.AppealMapper;
 import org.dromara.library.mapper.ViolationMapper;
 import org.dromara.library.service.IAppealService;
 import org.dromara.library.service.ICreditService;
+import org.dromara.message.utils.NotificationHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,6 +103,11 @@ public class AppealServiceImpl implements IAppealService {
                 }
             }
         }
+        // 站内通知申诉读者审批结果
+        NotificationHelper.send(appeal.getReaderId(), "申诉结果",
+            pass ? "你的违约申诉已通过，已解除该违约并回补相应信用分。"
+                 : "你的违约申诉未通过。" + (remark != null && !remark.isBlank() ? "原因：" + remark : ""),
+            "appeal", id);
         return true;
     }
 

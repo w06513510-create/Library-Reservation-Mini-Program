@@ -29,6 +29,9 @@
     <view v-if="noBookableToday" class="note note--warn">今日已无可约时段，请选择明天或之后的日期</view>
     <view v-else class="note">开放时段 08:00–22:00 · 仅可预约今日及未来、尚未开始的时段（北京时间）</view>
 
+    <!-- 快速选座 -->
+    <view v-if="!noBookableToday" class="quick" @click="quickReserve">⚡ 快速选座 · 自动分配一个空座</view>
+
     <!-- 图例 -->
     <view class="legend">
       <text class="lg"><text class="dot dot--free"></text>可选</text>
@@ -182,6 +185,15 @@ function tapSeat(s: SeatStatusVo) {
   picked.value = picked.value?.id === s.id ? null : s;
 }
 
+/** 快速选座：自动挑当前楼层/时段第一个空座并下单 */
+function quickReserve() {
+  if (noBookableToday.value) { uni.showToast({ title: '今日已无可约时段', icon: 'none' }); return; }
+  const free = seats.value.find((s) => !s.occupied && s.seatStatus === 0);
+  if (!free) { uni.showToast({ title: '该时段暂无空座', icon: 'none' }); return; }
+  picked.value = free;
+  doReserve();
+}
+
 async function doReserve() {
   if (!picked.value || submitting.value) return;
   if (!getToken()) {
@@ -268,6 +280,16 @@ onShow(() => {
   font-size: 22rpx;
   color: #b3aaa1;
   &--warn { color: #cf5b4e; }
+}
+.quick {
+  margin: 4rpx 24rpx 16rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #d9714e;
+  background: #fdeee7;
+  border: 2rpx dashed #e6a488;
+  border-radius: 12rpx;
+  padding: 20rpx;
 }
 .legend {
   display: flex;

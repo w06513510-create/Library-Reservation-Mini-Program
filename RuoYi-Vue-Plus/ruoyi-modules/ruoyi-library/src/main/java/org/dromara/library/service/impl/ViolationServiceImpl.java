@@ -16,6 +16,7 @@ import org.dromara.library.mapper.ViolationMapper;
 import org.dromara.library.service.IBlacklistService;
 import org.dromara.library.service.ICreditService;
 import org.dromara.library.service.IViolationService;
+import org.dromara.message.utils.NotificationHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -135,7 +136,25 @@ public class ViolationServiceImpl implements IViolationService {
                 : "近" + banWindowDays + "天内有效违约累计达" + banVioCount + "次";
             blacklistService.addToBlacklist(readerId, reason, banDays);
         }
+        // 站内通知读者（静默容错、独立事务，不影响记违约主流程）
+        NotificationHelper.send(readerId, "违约提醒",
+            "你产生一条违约（" + vioName(type) + "），扣信用分 " + deduct + " 分。如有异议，可在小程序「违约与申诉」中发起申诉。",
+            "violation", v.getId());
         return v.getId();
+    }
+
+    /** 违约类型中文名（供通知展示） */
+    private String vioName(int type) {
+        return switch (type) {
+            case 1 -> "座位爽约";
+            case 2 -> "暂离超时";
+            case 3 -> "监督未落座";
+            case 4 -> "未签退";
+            case 5 -> "图书逾期";
+            case 6 -> "预约架超期";
+            case 7 -> "遗失损坏";
+            default -> "违约";
+        };
     }
 
     @Override

@@ -16,6 +16,7 @@ import org.dromara.library.domain.vo.RoomReservationVo;
 import org.dromara.library.mapper.RoomMapper;
 import org.dromara.library.mapper.RoomReservationMapper;
 import org.dromara.library.service.IRoomReservationService;
+import org.dromara.message.utils.NotificationHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,6 +123,11 @@ public class RoomReservationServiceImpl implements IRoomReservationService {
         if (rows != 1) {
             throw new ServiceException("当前状态无法审批通过（需为待审批）");
         }
+        RoomReservation r = baseMapper.selectById(id);
+        if (r != null) {
+            NotificationHelper.send(r.getReaderId(), "研讨间预约已通过",
+                "你的研讨间预约已通过审批，请按预约时段到场使用。", "roomReservation", id);
+        }
         return true;
     }
 
@@ -137,6 +143,11 @@ public class RoomReservationServiceImpl implements IRoomReservationService {
             .eq(RoomReservation::getStatus, 0));
         if (rows != 1) {
             throw new ServiceException("当前状态无法驳回（需为待审批）");
+        }
+        RoomReservation r = baseMapper.selectById(id);
+        if (r != null) {
+            NotificationHelper.send(r.getReaderId(), "研讨间预约被驳回",
+                "你的研讨间预约未通过审批。" + (reason != null && !reason.isBlank() ? "原因：" + reason : ""), "roomReservation", id);
         }
         return true;
     }

@@ -96,7 +96,7 @@ function goLogin() {
   padding: 4rpx 8rpx 20rpx;
   .read-all {
     font-size: 26rpx;
-    color: #409eff;
+    color: #d9714e;
   }
 }
 .item {
