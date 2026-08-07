@@ -78,6 +78,12 @@
             <artifactId>ruoyi-message</artifactId>
         </dependency>
 
+        <!-- C 端接入基座：AppLoginHelper（app_user 会话取当前登录读者），供 /app/library/* 读者端接口用 -->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-app</artifactId>
+        </dependency>
+
         <!-- 定时任务：SnailJob 客户端（@JobExecutor）-->
         <dependency>
             <groupId>org.dromara</groupId>
